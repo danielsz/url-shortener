@@ -8,6 +8,9 @@
 		[com.taoensso/carmine "2.6.2"]
 		[commons-validator/commons-validator "1.4.0"]
                 ]
+  :plugins [[org.danielsz/lein-runit "0.1.0-SNAPSHOT"]] 
+  :runit {:app-root "/opt"
+          :service-root "/etc/sv"}
   :main ^:skip-aot url-shortener.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})
