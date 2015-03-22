@@ -7,11 +7,14 @@
 		[http-kit "2.1.16"]
 		[com.taoensso/carmine "2.6.2"]
 		[commons-validator/commons-validator "1.4.0"]
-                ]
-  :plugins [[org.danielsz/lein-runit "0.1.0-SNAPSHOT"]] 
+                [environ "1.0.0"]]
+  :plugins [[org.danielsz/lein-runit "0.1.0-SNAPSHOT"]
+            [lein-environ "1.0.0"]] 
   :runit {:app-root "/opt"
           :service-root "/etc/sv"}
   :main ^:skip-aot url-shortener.core
   :target-path "target/%s"
-  :profiles {:uberjar {:aot :all}})
+  :profiles {:uberjar {:aot :all}
+             :dev {:host "http://localhost:8080/"}
+             :production {:host "http://dan.tuppu.net:8080/"}})
 

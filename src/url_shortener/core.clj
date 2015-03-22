@@ -2,7 +2,9 @@
   (:gen-class)
   (:require
     [org.httpkit.server :refer [run-server]] ; Web server
-    [taoensso.carmine :as redis]) ; Redis client
+    [taoensso.carmine :as redis] ; Redis client
+    [environ.core :refer [env]]) 
+  
   (:import
     clojure.lang.Murmur3 ; Look what I found!
     org.apache.commons.validator.routines.UrlValidator))
@@ -15,7 +17,7 @@
   (let [rand-str (hash-url path)]
     (redis/wcar nil
       (redis/set (str "/" rand-str) path))
-    (str "http://localhost:8080/" rand-str)))
+    (str (:host env) rand-str)))
 
 (defn handle-create [{path :uri :as request}]
   (if (.isValid validator (apply str (rest path)))
