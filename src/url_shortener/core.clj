@@ -25,9 +25,9 @@
 
 ;; publish host details from request headers on a pub/sub channel whose topic is the shortened link
 (defn handle-redirect [{path :uri :as request}]
-  (let [host (get (:headers request) "host")
+  (let [remote-addr (:remote-addr request)
         [rc url] (redis/wcar nil
-                             (redis/publish path host)
+                             (redis/publish path remote-addr)
                              (redis/get path))]
     (if url
       {:status 302 :body "" :headers {"Location" url}}
