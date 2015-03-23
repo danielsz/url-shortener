@@ -16,5 +16,5 @@
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}
              :dev {:env {:host "http://localhost:8080/"}}
-             :production {:env {:host "http://dan.tuppu.net:8080/"}}})
+             :production {:env {:host "http://tuppu.net/"}}})
 
