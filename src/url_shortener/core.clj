@@ -4,7 +4,6 @@
     [org.httpkit.server :refer [run-server]] ; Web server
     [taoensso.carmine :as redis] ; Redis client
     [environ.core :refer [env]]) 
-  
   (:import
     clojure.lang.Murmur3 ; Look what I found!
     org.apache.commons.validator.routines.UrlValidator))
@@ -24,8 +23,12 @@
     {:status 200 :body (create-short-url (apply str (rest path)))}
     {:status 401 :body "Invalid Url provided"}))
 
+;; publish host details from request headers on a pub/sub channel whose topic is the shortened link
 (defn handle-redirect [{path :uri :as request}]
-  (let [url (redis/wcar nil (redis/get path))]
+  (let [host (get (:headers request) "host")
+        [rc url] (redis/wcar nil
+                             (redis/publish path host)
+                             (redis/get path))]
     (if url
       {:status 302 :body "" :headers {"Location" url}}
       {:status 404 :body "Unknown destination."})))
