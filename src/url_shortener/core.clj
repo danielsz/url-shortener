@@ -18,10 +18,13 @@
       (redis/set (str "/" rand-str) path))
     (str (:host env) rand-str)))
 
-(defn handle-create [{path :uri :as request}]
-  (if (.isValid validator (apply str (rest path)))
-    {:status 200 :body (create-short-url (apply str (rest path)))}
-    {:status 401 :body "Invalid Url provided"}))
+(defn handle-create [{path :uri query-string :query-string :as request}]
+  (let [path (apply str (rest path))
+        url (if query-string (str path "?" query-string)
+                path)]
+    (if (.isValid validator url)
+      {:status 200 :body (create-short-url url)}
+      {:status 401 :body "Invalid Url provided"})))
 
 ;; publish host details from request headers on a pub/sub channel whose topic is the shortened link
 (defn handle-redirect [{path :uri :as request}]
