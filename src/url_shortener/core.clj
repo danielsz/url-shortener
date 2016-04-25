@@ -3,6 +3,7 @@
   (:require
     [org.httpkit.server :refer [run-server]] ; Web server
     [taoensso.carmine :as redis] ; Redis client
+    [ring.middleware.params :refer [wrap-params]]
     [environ.core :refer [env]]) 
   (:import
     clojure.lang.Murmur3 ; Look what I found!
@@ -18,13 +19,11 @@
       (redis/set (str "/" rand-str) path))
     (str (:host env) rand-str)))
 
-(defn handle-create [{path :uri query-string :query-string :as request}]
-  (let [path (apply str (rest path))
-        url (if query-string (str path "?" query-string)
-                path)]
+(defn handle-create [{params :params :as request}]
+  (let [url (get params "url")]
     (if (.isValid validator url)
       {:status 200 :body (create-short-url url)}
-      {:status 401 :body "Invalid Url provided"})))
+      {:status 401 :body "Invalid Url provided (tuppu.net)"})))
 
 ;; publish host details from request headers on a pub/sub channel whose topic is the shortened link
 (defn handle-redirect [{path :uri :as request}]
@@ -43,5 +42,5 @@
 
 (defn -main [& args]
   (println "args (ignored)" args)
-  (run-server handler {:port 8080} ))
+  (run-server (wrap-params handler) {:port 8080}))
 

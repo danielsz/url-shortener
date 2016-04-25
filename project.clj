@@ -4,10 +4,11 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.6.0"]
-		[http-kit "2.1.16"]
-		[com.taoensso/carmine "2.6.2"]
-		[commons-validator/commons-validator "1.4.0"]
-                [environ "1.0.0"]]
+                 [http-kit "2.1.16"]
+                 [com.taoensso/carmine "2.6.2"]
+                 [ring/ring-core "1.4.0"]
+                 [commons-validator/commons-validator "1.4.0"]
+                 [environ "1.0.0"]]
   :plugins [[org.danielsz/lein-runit "0.1.0-SNAPSHOT"]
             [lein-environ "1.0.0"]] 
   :runit {:app-root "/opt"
