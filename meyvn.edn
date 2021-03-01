@@ -1,4 +1,4 @@
-{:pom {:group-id "url-shortener",
+{:pom {:group-id "org.danielsz",
        :artifact-id "url-shortener",
        :version "1.0.1",
        :name "url-shortener"},
