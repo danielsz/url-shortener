@@ -3,8 +3,7 @@
   (:require
     [org.httpkit.server :refer [run-server]] ; Web server
     [taoensso.carmine :as redis] ; Redis client
-    [ring.middleware.params :refer [wrap-params]]
-    [environ.core :refer [env]]) 
+    [ring.middleware.params :refer [wrap-params]]) 
   (:import
     clojure.lang.Murmur3 ; Look what I found!
     org.apache.commons.validator.routines.UrlValidator))
@@ -17,7 +16,7 @@
   (let [rand-str (hash-url path)]
     (redis/wcar nil
       (redis/set (str "/" rand-str) path))
-    (str (:host env) rand-str)))
+    (str (System/getProperty "host") rand-str)))
 
 (defn handle-create [{params :params :as request}]
   (let [url (get params "url")]
@@ -42,5 +41,5 @@
 
 (defn -main [& args]
   (println "args (ignored)" args)
-  (run-server (wrap-params handler) {:port 8080}))
+  (run-server (wrap-params handler) {:port (Integer. (System/getProperty "listening.port"))}))
 
