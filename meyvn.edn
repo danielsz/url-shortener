@@ -19,8 +19,8 @@
                                           :javafx-class "main.core.App"},
                        :pre-compilation-script {:enabled false,
                                                 :path "repl/pre-script.clj"},
-                       :remote-repository {:id "ssh-repository",
-                                           :url "scpexe://user@domain:/home/.m2/repository"},
+                       :remote-repository {:id "ssh-repository"
+                                  :url "scpexe://danielsz@dan.tuppu.net:/home/danielsz/.m2/repository"},
                        :jpackage {:enabled false,
                                   :destination "jpackage-target"},
                        :javafx {:enabled false,

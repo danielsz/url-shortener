@@ -3,7 +3,8 @@
   (:require
     [org.httpkit.server :refer [run-server]] ; Web server
     [taoensso.carmine :as redis] ; Redis client
-    [ring.middleware.params :refer [wrap-params]]) 
+    [ring.middleware.params :refer [wrap-params]]
+    [jvm-utils.core :as jvm])
   (:import
     clojure.lang.Murmur3 ; Look what I found!
     org.apache.commons.validator.routines.UrlValidator))
@@ -41,5 +42,6 @@
 
 (defn -main [& args]
   (println "args (ignored)" args)
+  (jvm/merge-properties)
   (run-server (wrap-params handler) {:port (Integer. (System/getProperty "listening.port"))}))
 
