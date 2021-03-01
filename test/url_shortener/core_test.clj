@@ -1,6 +1,6 @@
 (ns url-shortener.core-test
-  (:require [clojure.test :refer :all]
-            [url-shortener.core :refer :all]
+  (:require [clojure.test :refer [is deftest testing]]
+            [url-shortener.core :refer [handle-redirect handle-create create-short-url]]
             [taoensso.carmine :as redis])
   (:import  java.net.URL))
 
@@ -22,7 +22,7 @@
          (:status (handle-redirect {:path "/unknown"}))))
 
   ; Gen and retrieve
-  (let [orig-url "http://google.com?asdf"
+  (let [orig-url "https://github.com/ptaoussanis/carmine"
         new-url (create-short-url orig-url)
         path (.getPath (URL. new-url))]
     ; Saved to redis
@@ -37,7 +37,7 @@
            orig-url))
 
     ; Hashes sensibly
-    (is (= (:body (handle-create {:uri (str "/" orig-url)}))
+    (is (= (:body (handle-create {:params {"url" orig-url}}))
            new-url))
     ))
 )
