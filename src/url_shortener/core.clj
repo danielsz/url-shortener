@@ -32,16 +32,16 @@
                              (redis/publish path remote-addr)
                              (redis/get path))]
     (if url
-      {:status 302 :body "" :headers {"Location" url}}
+      {:status 301 :body "" :headers {"Location" url}}
       {:status 404 :body "Unknown destination."})))
 
 (defn handler [{method :request-method :as req}]
   (case method
     :get (handle-redirect req)
+    :head (handle-redirect req)
     :post (handle-create req)))
 
 (defn -main [& args]
-  (println "args (ignored)" args)
   (jvm/merge-properties)
   (run-server (wrap-params handler) {:port (Integer. (System/getProperty "listening.port"))}))
 
