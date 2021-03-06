@@ -39,7 +39,9 @@
   (case method
     :get (handle-redirect req)
     :head (handle-redirect req)
-    :post (handle-create req)))
+    :post (handle-create req)
+    :options {:status 204 :headers {"Allow" "OPTIONS, GET, HEAD, POST"}}
+    {:status 405})) ; Method Not Allowed
 
 (defn -main [& args]
   (jvm/merge-properties)
