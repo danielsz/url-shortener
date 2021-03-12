@@ -19,7 +19,7 @@
   (let [rand-str (hash-url path)]
     (redis/wcar nil
       (redis/set (str "/" rand-str) path))
-    (str (System/getProperty "host") rand-str)))
+    (str (System/getProperty "unshorten.endpoint") rand-str)))
 
 (defn handle-create [{params :params :as request}]
   (let [url (get params "url")]
@@ -29,7 +29,6 @@
 
 ;; publish host details from request headers on a pub/sub channel whose topic is the shortened link
 (defn handle-redirect [{path :uri :as request}]
-  (log/debug request)
   (let [remote-addr (:remote-addr request)
         [rc url] (redis/wcar nil
                              (redis/publish path remote-addr)

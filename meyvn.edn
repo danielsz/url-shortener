@@ -105,7 +105,7 @@
                       :tools-deps-alias :cljs},
                :kawa {:enabled false}},
  :profiles {:enabled true
-            :development {:host "http://localhost:8080/"
+            :development {:unshorten-endpoint "http://localhost:8080/"
                           :listening-port "8080"}
-            :production {:host "https://tuppu.net/"
+            :production {:unshorten-endpoint "http://tuppu.net/"
                          :listening-port "8080"}}}
