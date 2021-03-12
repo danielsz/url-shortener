@@ -4,6 +4,7 @@
     [org.httpkit.server :refer [run-server]] ; Web server
     [taoensso.carmine :as redis] ; Redis client
     [ring.middleware.params :refer [wrap-params]]
+    [ring.middleware.proxy-headers :refer [wrap-forwarded-remote-addr]]
     [jvm-utils.core :as jvm])
   (:import
     clojure.lang.Murmur3 ; Look what I found!
@@ -45,5 +46,5 @@
 
 (defn -main [& args]
   (jvm/merge-properties)
-  (run-server (wrap-params handler) {:port (Integer. (System/getProperty "listening.port"))}))
+  (run-server (-> handler wrap-params wrap-forwarded-remote-addr) {:port (Integer. (System/getProperty "listening.port"))}))
 

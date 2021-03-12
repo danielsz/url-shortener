@@ -1,6 +1,7 @@
 {:deps {http-kit/http-kit {:mvn/version "2.5.3"}
         com.taoensso/carmine {:mvn/version "3.1.0"}
         ring/ring-core {:mvn/version "1.9.1"}
+        ring/ring-headers {:mvn/version "0.3.0"}
         commons-validator/commons-validator {:mvn/version "1.7"}
         org.danielsz/jvm-utils {:mvn/version "0.1.2"}}
  :aliases {:repl {:extra-deps {nrepl/nrepl {:mvn/version "0.8.3"}
