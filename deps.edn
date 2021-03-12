@@ -3,7 +3,9 @@
         ring/ring-core {:mvn/version "1.9.1"}
         ring/ring-headers {:mvn/version "0.3.0"}
         commons-validator/commons-validator {:mvn/version "1.7"}
-        org.danielsz/jvm-utils {:mvn/version "0.1.2"}}
+        org.danielsz/jvm-utils {:mvn/version "0.1.2"}
+        ch.qos.logback/logback-classic {:mvn/version "1.2.3"}
+        org.clojure/tools.logging {:mvn/version "1.1.0"}}
  :aliases {:repl {:extra-deps {nrepl/nrepl {:mvn/version "0.8.3"}
                                cider/cider-nrepl {:mvn/version "0.25.9"}
                                org.danielsz/meyvn-nrepl-middleware {:mvn/version "1.1.9"}}}}}

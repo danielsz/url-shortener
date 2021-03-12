@@ -5,6 +5,7 @@
     [taoensso.carmine :as redis] ; Redis client
     [ring.middleware.params :refer [wrap-params]]
     [ring.middleware.proxy-headers :refer [wrap-forwarded-remote-addr]]
+    [clojure.tools.logging :as log]
     [jvm-utils.core :as jvm])
   (:import
     clojure.lang.Murmur3 ; Look what I found!
@@ -28,6 +29,7 @@
 
 ;; publish host details from request headers on a pub/sub channel whose topic is the shortened link
 (defn handle-redirect [{path :uri :as request}]
+  (log/debug request)
   (let [remote-addr (:remote-addr request)
         [rc url] (redis/wcar nil
                              (redis/publish path remote-addr)
