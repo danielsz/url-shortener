@@ -1,6 +1,6 @@
 {:pom {:group-id "org.danielsz",
        :artifact-id "url-shortener",
-       :version "1.0.3",
+       :version "1.0.4",
        :name "url-shortener"},
  :build-properties {:project-build-sourceEncoding "UTF-8"},
  :packaging {:uberjar {:graalvm {:enabled false,
@@ -107,5 +107,5 @@
  :profiles {:enabled true
             :development {:unshorten-endpoint "http://localhost:8080/"
                           :listening-port "8080"}
-            :production {:unshorten-endpoint "http://tuppu.net/"
+            :production {:unshorten-endpoint "https://tuppu.net/"
                          :listening-port "8080"}}}
