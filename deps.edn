@@ -1,11 +1,12 @@
-{:deps {http-kit/http-kit {:mvn/version "2.5.3"}
-        com.taoensso/carmine {:mvn/version "3.1.0"}
+{:deps {http-kit/http-kit {:mvn/version "2.8.0-RC1"}
+        com.taoensso/carmine {:mvn/version "3.3.2"}
         ring/ring-core {:mvn/version "1.9.1"}
         ring/ring-headers {:mvn/version "0.3.0"}
-        commons-validator/commons-validator {:mvn/version "1.7"}
+        commons-validator/commons-validator {:mvn/version "1.8.0"}
         org.danielsz/jvm-utils {:mvn/version "0.1.2"}
-        ch.qos.logback/logback-classic {:mvn/version "1.2.3"}
-        org.clojure/tools.logging {:mvn/version "1.1.0"}}
- :aliases {:repl {:extra-deps {nrepl/nrepl {:mvn/version "0.8.3"}
-                               cider/cider-nrepl {:mvn/version "0.25.9"}
-                               org.danielsz/meyvn-nrepl-middleware {:mvn/version "1.1.9"}}}}}
+        ch.qos.logback/logback-classic {:mvn/version "1.5.6"}
+        org.clojure/tools.logging {:mvn/version "1.3.0"}}
+ :aliases {:repl {:extra-deps {nrepl/nrepl {:mvn/version "1.1.1"}
+                               cider/cider-nrepl {:mvn/version "0.47.1"}
+                               org.danielsz/system {:mvn/version "0.5.3"}
+                               org.meyvn/nrepl-middleware {:mvn/version "1.3.5"}}}}}

@@ -1,15 +1,15 @@
 (ns url-shortener.core
   (:gen-class)
   (:require
-    [org.httpkit.server :refer [run-server]] ; Web server
-    [taoensso.carmine :as redis] ; Redis client
-    [ring.middleware.params :refer [wrap-params]]
-    [ring.middleware.proxy-headers :refer [wrap-forwarded-remote-addr]]
-    [clojure.tools.logging :as log]
-    [jvm-utils.core :as jvm])
+   [org.httpkit.server :refer [run-server]] ; Web server
+   [taoensso.carmine :as redis] ; Redis client
+   [ring.middleware.params :refer [wrap-params]]
+   [ring.middleware.proxy-headers :refer [wrap-forwarded-remote-addr]]
+   [clojure.tools.logging :as log]
+   [jvm-utils.core :as jvm])
   (:import
-    clojure.lang.Murmur3 ; Look what I found!
-    org.apache.commons.validator.routines.UrlValidator))
+   clojure.lang.Murmur3 ; Look what I found!
+   org.apache.commons.validator.routines.UrlValidator))
 
 (def validator (UrlValidator. (into-array ["http" "https"])))
 (def hash-url (comp (partial format "%x")
