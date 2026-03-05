@@ -21,22 +21,9 @@
              :jar {:enabled false}},
  :testing {:enabled false, :tools-deps-alias :test},
  :scm {:enabled false},
- :interactive {:system {:enabled false,
-                        :var "a.namespace/system-var",
-                        :restart-on-change ["handler.clj"
-                                            "system.clj"]},
-               :figwheel {:enabled false,
-                          :main {:watch-dirs ["src/cljs"],
-                                 :open-url false},
-                          :build {:main "main.core",
-                                  :foreign-libs [],
-                                  :output-dir "target/classes/js/compiled",
-                                  :output-to "target/classes/js/main.js",
-                                  :asset-path "/js/compiled",
-                                  :output-wrapper true,
-                                  :aot-cache true,
-                                  :infer-externs true},
-                          :tools-deps-alias :figwheel},
+ :interactive {:system {:enabled true,
+                        :var "url-shortener.system/base",
+                        :restart-on-change ["core.clj" "system.clj" "handler.clj" "shortener.clj"]},
                :proxy {:enabled false,
                        :socks {:host "127.0.0.1",
                                :port "1080",
@@ -46,28 +33,11 @@
                :repl-host "127.0.0.1",
                :reload-on-save true,
                :repl-port :auto,
-               :enabled true,
-               :cljs {:enabled false,
-                      :with-repl false,
-                      :compiler-opts {:infer-externs true,
-                                      :output-dir "target/classes/js/compiled",
-                                      :optimizations :none,
-                                      :parallel-build true,
-                                      :verbose true,
-                                      :aot-cache true,
-                                      :output-to "target/classes/js/main.js",
-                                      :asset-path "/js/compiled",
-                                      :output-wrapper true,
-                                      :watch "src/cljs",
-                                      :source-map true,
-                                      :foreign-libs [],
-                                      :main "main.core"},
-                      :tools-deps-alias :cljs},
-               :kawa {:enabled false}},
+               :enabled true,},
  :distribution-management {:id "ssh-repository"
                            :url "scpexe://danielsz@dan.tuppu.net:/home/danielsz/.m2/repository"}
  :profiles {:enabled true
-            :development {:unshorten-endpoint "http://localhost:8080/"
-                          :listening-port "8080"}
-            :production {:unshorten-endpoint "https://tuppu.net/"
-                         :listening-port "8080"}}}
+            :development {:shorten-endpoint "http://localhost:8080/"
+                          :http-port "8088"}
+            :production {:shorten-endpoint "https://tuppu.net/"
+                         :http-port "8080"}}}
