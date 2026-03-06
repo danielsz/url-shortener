@@ -13,7 +13,7 @@
 
 (def ^:private TTL-LINK     (* 90 86400))
 (def ^:private TTL-ANALYTICS (* 90 86400))
-(def ^:private TTL-REPORT   (*  7 86400))
+
 
 (def ^:private ip-validator  (InetAddressValidator/getInstance))
 (def ^:private url-validator (UrlValidator. (into-array ["http" "https"])))
@@ -24,9 +24,9 @@
 (defn- ips-key       [path] (str path ":ips"))
 (defn- referrers-key [path] (str path ":referrers"))
 (defn- daily-key     [path] (str path ":daily"))
-(defn- reports-key   [path] (str path ":reports"))
+
 (defn- user-key      [user] (str "user:" user ":links"))
-(defn- report-key    [tok]  (str "report:" tok))
+
 
 (defn- write-analytics! [path remote-addr referer]
   (log/debug path remote-addr referer)
@@ -49,7 +49,8 @@
   (if (.isValid url-validator url)
     (let [path (hash-url url)]
       (redis/wcar nil
-                  (redis/hmset path "url" url "user" user "clicks" 0)
+                  (redis/hset path "url" url "user" user)
+                  (redis/hsetnx path "clicks" 0)  
                   (redis/expire path TTL-LINK)
                   (redis/sadd  (user-key user) path))
       (response (str (System/getProperty "shorten.endpoint") path)))
