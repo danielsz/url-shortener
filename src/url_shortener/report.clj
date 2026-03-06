@@ -43,7 +43,6 @@
               (redis/hgetall (daily-key path))
               (redis/lrange  (referrers-key path) 0 -1))]
         {:status  200
-         :headers {"Content-Type" "application/json"}
          :body    {:path       path
                    :clicks     clicks
                    :unique-ips unique-ips

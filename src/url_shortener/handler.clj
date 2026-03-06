@@ -3,7 +3,6 @@
    [url-shortener.shortener :refer [create-short-url handle-redirect]]
    [url-shortener.report :refer [handle-report handle-create-report]]
    [reitit.ring :as ring]
-   [ring.util.response :refer [header status]]
    [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
    [muuntaja.middleware :refer [wrap-params wrap-format]]
    [ring.middleware.proxy-headers :refer [wrap-forwarded-remote-addr]]
