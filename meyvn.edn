@@ -37,7 +37,7 @@
  :distribution-management {:id "ssh-repository"
                            :url "scpexe://danielsz@dan.tuppu.net:/home/danielsz/.m2/repository"}
  :profiles {:enabled true
-            :development {:shorten-endpoint "http://localhost:8080/"
+            :development {:shorten-endpoint "http://localhost:8088/"
                           :http-port "8088"}
             :production {:shorten-endpoint "https://tuppu.net/"
                          :http-port "8080"}}}
