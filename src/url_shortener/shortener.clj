@@ -28,8 +28,9 @@
 (defn- user-key      [user] (str "user:" user ":links"))
 
 
-(defn- write-analytics! [path remote-addr referer]
+(defn- write-analytics! [geoip path remote-addr referer]
   (log/debug path remote-addr referer)
+  (log/debug (.get @(:client geoip) (java.net.InetAddress/getByName "2600:3c18::f03c:92ff:fe84:1930") java.util.Map))
   (try
     (when (.isValid ip-validator remote-addr)
       (redis/wcar nil
@@ -56,13 +57,13 @@
       (response (str (System/getProperty "shorten.endpoint") path)))
     (bad-request "Invalid Url provided (tuppu.net)")))
 
-(defn handle-redirect [{{path :path} :path-params remote-addr :remote-addr headers :headers :as request}]
+(defn handle-redirect [geoip {{path :path} :path-params remote-addr :remote-addr headers :headers :as request}]
   (let [referer (get headers "referer")        
         [rc url] (redis/wcar nil
                       (redis/hincrby path "clicks" 1)
                       (redis/hget    path "url"))]
     (when url
-      (future (write-analytics! path remote-addr referer)))
+      (future (write-analytics! geoip path remote-addr referer)))
     (if url
       (redirect url)
       (not-found "Unknown destination."))))

@@ -8,17 +8,16 @@
    [ring.middleware.proxy-headers :refer [wrap-forwarded-remote-addr]]
    [clojure.tools.logging :as log]))
 
-
-(defn ring-handler [{redis :redis}]
+(defn ring-handler [{geoip :geoip redis :redis}]
   (ring/router [["/shorten" {:post create-short-url}]
                 ["/report"        {:post handle-create-report}]
                 ["/report/:token" {:get handle-report}]]))
 
-(defn default-handler [_]
+(defn default-handler [{geoip :geoip redis :redis}]
   (ring/routes
    (ring/create-resource-handler {:path "/" :root ""})
-   (ring/ring-handler (ring/router ["/:path" {:get handle-redirect
-                                              :head handle-redirect}]))
+   (ring/ring-handler (ring/router ["/:path" {:get (partial handle-redirect geoip)
+                                              :head (partial handle-redirect geoip)}]))
    (ring/create-default-handler)))
 
 (def middleware [[wrap-defaults api-defaults]
