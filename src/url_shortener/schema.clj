@@ -2,12 +2,12 @@
 
 ;; -- Key schema ---------------------------------------------------------------
 ;;
-;; /<hash>            hash    url, user, clicks         TTL-LINK
-;; /<hash>:ips        zset    ip → last-seen epoch      TTL-ANALYTICS
-;; /<hash>:referrers  list    referer strings           TTL-ANALYTICS
-;; /<hash>:daily      hash    "yyyy-MM-dd" → count      TTL-ANALYTICS
-;; /<hash>:reports    set     share tokens              no TTL
-;; /<hash>:countries  hash    "ISO-code" → count        TTL-ANALYTICS
+;; <hash>            hash    url, user, description, clicks TTL-LINK
+;; <hash>:ips        zset    ip → last-seen epoch      TTL-ANALYTICS
+;; <hash>:referrers  list    referer strings           TTL-ANALYTICS
+;; <hash>:daily      hash    "yyyy-MM-dd" → count      TTL-ANALYTICS
+;; <hash>:reports    set     share tokens              no TTL
+;; <hash>:countries  hash    "ISO-code" → count        TTL-ANALYTICS
 ;; user:<u>:links     set     paths owned by user       no TTL
 ;; report:<token>     hash    owner, path, created      TTL-REPORT
 

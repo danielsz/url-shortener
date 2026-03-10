@@ -7,11 +7,11 @@
             [ring.util.response :refer [response bad-request not-found redirect]]))
 
 
-(defn shorten [{{:keys [url user] :or {user "anonymous"}} :params :as request}]
+(defn shorten [{{:keys [url user description] :or {user "anonymous" description ""}} :params :as request}]
   (if (.isValid url-validator url)
     (let [path (hash-url url)]
       (redis/wcar nil
-                  (redis/hset path "url" url "user" user)
+                  (redis/hset path "url" url "user" user "description" description)
                   (redis/hsetnx path "clicks" 0)  
                   (redis/expire path TTL-LINK)
                   (redis/sadd  (user-key user) path))
@@ -54,13 +54,4 @@
           (not-found "Unknown destination (including legacy)."))))
 
 
-(defn legacy [{path :uri :as request}]
-  (let [remote-addr (:remote-addr request)
-        referer (get (:headers request) "referer")
-        [rc url] (redis/wcar nil
-                             (redis/publish (str "/" path) {:remote-addr remote-addr :referer referer})
-                             (redis/get (str "/" path)))]
-    (log/debug "rc" rc)
-    (if url
-      {:status 301 :body "" :headers {"Location" url}}
-      {:status 404 :body "Unknown destination."})))
+
