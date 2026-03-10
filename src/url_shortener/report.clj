@@ -28,7 +28,7 @@
                     (redis/hset  (report-key token) "owner" user "path" path "created" (.getEpochSecond (Instant/now)))
                     (redis/expire (report-key token) TTL-REPORT)
                     (redis/sadd   (reports-key path) token))
-        (response (str (System/getProperty "shorten.endpoint") "report/" token)))
+        (response (str (System/getProperty "shortener.service") "report/" token)))
       (status 403))))
 
 (defn handle-report [{{token :token} :path-params}]
@@ -36,16 +36,20 @@
         report (apply hash-map (redis/wcar nil (redis/hgetall rk)))]
     (if (seq report)
       (let [path (get report "path")
-            [clicks unique-ips daily referrers]
+            [clicks unique-ips daily referrers countries]
             (redis/wcar nil
               (redis/hget    path "clicks")
               (redis/zcard   (ips-key path))
               (redis/hgetall (daily-key path))
-              (redis/lrange  (referrers-key path) 0 -1))]
+              (redis/lrange  (referrers-key path) 0 -1)
+              (redis/hgetall (str path ":countries")))]
         {:status  200
          :body    {:path       path
                    :clicks     clicks
                    :unique-ips unique-ips
                    :daily      (apply hash-map daily)
-                   :referrers  referrers}})
+                   :referrers  referrers
+                   :countries  (apply hash-map countries)}})
       {:status 404 :body "Report not found or expired"})))
+
+
