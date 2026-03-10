@@ -17,4 +17,4 @@
 (defn daily-key     [path] (str path ":daily"))
 
 (def TTL-ANALYTICS (* 90 86400))
-(def TTL-LINK (* 90 86400))
+

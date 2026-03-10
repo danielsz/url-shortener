@@ -3,7 +3,7 @@
             [clojure.tools.logging :as log]
             [url-shortener.analytics :refer [write-analytics!]]
             [url-shortener.shared :refer [hash-url url-validator]]
-            [url-shortener.schema :refer [user-key TTL-LINK]]
+            [url-shortener.schema :refer [user-key]]
             [ring.util.response :refer [response bad-request not-found redirect]]))
 
 
@@ -13,7 +13,6 @@
       (redis/wcar nil
                   (redis/hset path "url" url "user" user "description" description)
                   (redis/hsetnx path "clicks" 0)  
-                  (redis/expire path TTL-LINK)
                   (redis/sadd  (user-key user) path))
       (response (str (System/getProperty "shortener.service") path)))
     (bad-request "Invalid Url provided (tuppu.net)")))
