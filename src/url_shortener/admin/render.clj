@@ -14,9 +14,8 @@
 (defn- parse-long* [s] (when s (Long/parseLong s)))
 
 (defn- all-link-hashes []
-  (->> (redis/wcar nil (redis/keys "*"))
-       (remove #(re-find #"[:/]" %))
-       sort))
+  (sort (redis/wcar nil (redis/smembers "all-links"))))
+
 
 (defn- sparkline [daily-map]
   (let [days   (sort (keys daily-map))

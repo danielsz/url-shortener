@@ -1,4 +1,5 @@
 {:deps {http-kit/http-kit {:mvn/version "2.9.0-beta3"}
+        org.clojure/core.async {:mvn/version "1.8.741"}
         com.taoensso/carmine {:mvn/version "3.5.0"}
         ring/ring-core {:mvn/version "1.15.3"}
         ring/ring-headers {:mvn/version "0.4.0"}

@@ -14,7 +14,8 @@
       (redis/wcar nil
                   (redis/hset path "url" url "user" user "description" description)
                   (redis/hsetnx path "clicks" 0)  
-                  (redis/sadd  (user-key user) path))
+                  (redis/sadd  (user-key user) path)
+                  (redis/sadd   "all-links" path))
       (response (str (System/getProperty "shortener.service") path)))
     (bad-request "Invalid Url provided (tuppu.net)")))
 
