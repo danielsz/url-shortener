@@ -4,7 +4,7 @@
             [clojure.tools.logging :as log]
             [taoensso.carmine :as redis]
             [com.stuartsierra.component :as component]
-            [clojure.core.async :as a :refer [chan sliding-buffer <!! sub unsub close! thread]])
+            [clojure.core.async :as a :refer [chan dropping-buffer <!! sub unsub close! thread]])
   (:import java.time.LocalDate
            java.time.Instant))
 
@@ -19,7 +19,8 @@
                   (redis/hincrby (daily-key path) (str (LocalDate/now)) 1)
                   (redis/expire  (daily-key path) TTL-ANALYTICS))
       (when-let [m (.get @(:client geoip) (java.net.InetAddress/getByName remote-addr) java.util.Map)]
-          (redis/wcar nil
+        (log/debug (.get m "country_code"))
+        (redis/wcar nil
                       (redis/hincrby (str path ":countries") (.get m "country_code") 1)
                       (redis/expire  (str path ":countries") TTL-ANALYTICS))))
     (when referer
@@ -33,12 +34,11 @@
 (defrecord AnalyticsConsumer []
   component/Lifecycle
   (start [{:keys [pubsub geoip] :as component}]
-    (let [ch (chan (sliding-buffer 64))]
+    (let [ch (chan (dropping-buffer 64))]
       (sub (:publication pubsub) :click ch)
       (thread
         (loop []
           (when-let [{:keys [path remote-addr referer]} (<!! ch)]
-            (log/debug "pubsub consuming analytics")
             (write-analytics! geoip path remote-addr referer)
             (recur))))
       (assoc component :ch ch)))

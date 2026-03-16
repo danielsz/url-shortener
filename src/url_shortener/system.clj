@@ -18,7 +18,7 @@
 (defn base []
   (component/system-map
    :redis (new-redis :spec {:db 0})
-   :pubsub (new-pubsub  (fn [_] (chan 1024)) :topic)
+   :pubsub (new-pubsub  (fn [_] (chan)) :topic)
    :geoip (new-maxmind-db :db (io/file (System/getProperty "geoip.db")))
    :analytics (component/using (map->AnalyticsConsumer {}) [:pubsub :geoip])
    :endpoint (component/using (new-endpoint :routes ring-handler) [:redis :geoip])
