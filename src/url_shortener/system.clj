@@ -21,7 +21,7 @@
    :pubsub (new-pubsub  (fn [_] (chan)) :topic)
    :geoip (new-maxmind-db :db (io/file (System/getProperty "geoip.db")))
    :analytics (component/using (map->AnalyticsConsumer {}) [:pubsub :geoip])
-   :endpoint (component/using (new-endpoint :routes ring-handler) [:redis :geoip])
+   :endpoint (component/using (new-endpoint :routes ring-handler) [:redis :geoip :pubsub])
    :handler (component/using (new-handler :default-handler default-handler :options {:middleware middleware}) [:redis :endpoint :pubsub])
    :httpd (component/using (new-http-kit :port (Integer. (System/getProperty "http.port"))) [:handler])))
 

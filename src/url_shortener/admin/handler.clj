@@ -1,6 +1,7 @@
 (ns url-shortener.admin.handler
   (:require
     [hiccup2.core :as h]
+    [clojure.core.async :as a :refer [chan sliding-buffer <!! sub unsub close! thread]]
     [hiccup.page :refer [html5]]
     [clojure.tools.logging :as log]
     [starfederation.datastar.clojure.api :as d*]
@@ -44,23 +45,30 @@
         [:div.grid {:id "links"}]
         [:div {:id "countries"}]]]]])) ; main, sidebar, center, body close + html5 + defn
 
-(defn handle-admin-stream [request]
+(defn handle-admin-stream [pubsub request]
   (hk-gen/->sse-response request
     {hk-gen/on-open
      (fn [sse]
-       (try
-         (d*/patch-signals! sse "{\"connected\": true}")
-         (d*/patch-elements! sse (render/render-stats))
-         (d*/patch-elements! sse (render/render-links))
-         (d*/patch-elements! sse (render/render-countries))
-         (loop []
-           (Thread/sleep 5000)
+       (let [ch (chan (sliding-buffer 10))
+             cleanup! (fn [e]
+                        (log/debug "admin stream closed" (.getMessage e))
+                        (unsub (:publication pubsub) :click ch)
+                        (close! ch))]
+         (sub (:publication pubsub) :click ch)
+         (try
+           (d*/patch-signals! sse "{\"connected\": true}")
            (d*/patch-elements! sse (render/render-stats))
            (d*/patch-elements! sse (render/render-links))
            (d*/patch-elements! sse (render/render-countries))
-           (recur))
-         (catch Exception e
-           (log/debug "admin stream closed" (.getMessage e)))))}))
+           (loop []
+             (when-let [event (<!! ch)]
+               (try
+                 (d*/patch-elements! sse (render/render-stats))
+                 (d*/patch-elements! sse (render/render-links))
+                 (d*/patch-elements! sse (render/render-countries))
+                 (catch Exception e (cleanup! e)))
+               (recur)))
+           (catch Exception e (cleanup! e)))))}))
 
 
 (defn handle-admin [_]

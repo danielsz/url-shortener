@@ -9,13 +9,13 @@
    [ring.middleware.proxy-headers :refer [wrap-forwarded-remote-addr]]
    [clojure.tools.logging :as log]))
 
-(defn ring-handler [{geoip :geoip redis :redis}]
+(defn ring-handler [{geoip :geoip redis :redis pubsub :pubsub}]
   (ring/router [["/" {:post shorten}]
                 ["/shorten" {:post shorten}]
                 ["/report"        {:post handle-create-report}]
                 ["/report/:token" {:get handle-report}]
                 ["/admin"        {:get handle-admin}]
-                ["/admin/stream" {:get handle-admin-stream}]]))
+                ["/admin/stream" {:get (partial handle-admin-stream pubsub)}]]))
 
 (defn default-handler [component]
   (ring/routes
