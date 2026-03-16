@@ -1,0 +1,24 @@
+:root {
+  /* Utopia fluid type scale - min 360px, max 1240px */
+  --step--1: clamp(0.80rem, 0.77rem + 0.13vw, 0.89rem);
+  --step-0:  clamp(1.00rem, 0.96rem + 0.18vw, 1.13rem);
+  --step-1:  clamp(1.25rem, 1.19rem + 0.29vw, 1.41rem);
+  --step-2:  clamp(1.56rem, 1.48rem + 0.42vw, 1.76rem);
+  --step-3:  clamp(1.95rem, 1.85rem + 0.54vw, 2.20rem);
+
+  /* Utopia fluid space scale */
+  --space-xs: clamp(0.50rem, 0.48rem + 0.09vw, 0.56rem);
+  --space-s:  clamp(0.75rem, 0.72rem + 0.13vw, 0.84rem);
+  --space-m:  clamp(1.00rem, 0.96rem + 0.18vw, 1.13rem);
+  --space-l:  clamp(1.50rem, 1.44rem + 0.27vw, 1.69rem);
+  --space-xl: clamp(2.00rem, 1.92rem + 0.36vw, 2.25rem);
+
+  /* Colour tokens - admin only, no need for a full palette */
+  --color-bg:       #0f1117;
+  --color-surface:  #1a1d27;
+  --color-border:   #2a2d3a;
+  --color-text:     #e2e4ed;
+  --color-muted:    #6b7280;
+  --color-accent:   #6366f1;
+  --color-positive: #22c55e;
+}

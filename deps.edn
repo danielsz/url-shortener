@@ -12,5 +12,7 @@
         ring/ring-defaults #:mvn{:version "0.7.0"}
         metosin/muuntaja #:mvn{:version "0.6.11"}
         com.maxmind.db/maxmind-db #:mvn{:version "4.0.2"}
-        cider/cider-nrepl {:mvn/version "0.58.0"}}
+        cider/cider-nrepl {:mvn/version "0.58.0"}
+        hiccup/hiccup {:mvn/version "2.0.0"}
+        dev.data-star.clojure/http-kit {:mvn/version "1.0.0-RC8"}}
  :aliases {:repl {:extra-deps {org.meyvn/nrepl-middleware {:mvn/version "1.4.0"}}}}}

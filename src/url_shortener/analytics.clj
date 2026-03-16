@@ -2,7 +2,9 @@
   (:require [url-shortener.shared :refer [ip-validator]]
             [url-shortener.schema :refer [ips-key referrers-key daily-key TTL-ANALYTICS]]
             [clojure.tools.logging :as log]
-            [taoensso.carmine :as redis])
+            [taoensso.carmine :as redis]
+            [com.stuartsierra.component :as component]
+            [clojure.core.async :as a :refer [chan sliding-buffer <!! sub unsub close! thread]])
   (:import java.time.LocalDate
            java.time.Instant))
 
@@ -26,3 +28,21 @@
         (redis/expire (referrers-key path) TTL-ANALYTICS)))
     (catch Exception e
       (log/error e "analytics write failed" path))))
+
+
+(defrecord AnalyticsConsumer []
+  component/Lifecycle
+  (start [{:keys [pubsub geoip] :as component}]
+    (let [ch (chan (sliding-buffer 64))]
+      (sub (:publication pubsub) :click ch)
+      (thread
+        (loop []
+          (when-let [{:keys [path remote-addr referer]} (<!! ch)]
+            (log/debug "pubsub consuming analytics")
+            (write-analytics! geoip path remote-addr referer)
+            (recur))))
+      (assoc component :ch ch)))
+  (stop [{:keys [pubsub ch] :as component}]
+    (unsub (:publication pubsub) :click ch)
+    (close! ch)
+    (dissoc component :ch)))

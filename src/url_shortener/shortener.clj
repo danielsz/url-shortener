@@ -1,5 +1,6 @@
 (ns url-shortener.shortener
   (:require [taoensso.carmine :as redis]
+            [clojure.core.async :as a :refer [<!! >!! >! <! chan thread timeout go]]
             [clojure.tools.logging :as log]
             [url-shortener.analytics :refer [write-analytics!]]
             [url-shortener.shared :refer [hash-url url-validator]]
@@ -17,19 +18,21 @@
       (response (str (System/getProperty "shortener.service") path)))
     (bad-request "Invalid Url provided (tuppu.net)")))
 
-(defn handle-redirect [geoip {{path :path} :path-params remote-addr :remote-addr headers :headers :as request}]
+
+(defn handle-redirect [{redis :redis pubsub :pubsub} {{path :path} :path-params remote-addr :remote-addr headers :headers :as request}]
   (let [referer (get headers "referer")        
         [rc url] (redis/wcar nil
                       (redis/hincrby path "clicks" 1)
                       (redis/hget    path "url"))]
     (log/debug "rc" rc)
     (when url
-      (future (write-analytics! geoip path remote-addr referer)))
+      (thread (>!! (:channel pubsub) {:topic :click :path path :remote-addr remote-addr :referer referer})))
     (if url
       (redirect url)
       (not-found "Unknown destination."))))
 
-(defn handle-redirect-with-legacy [geoip {{path :path} :path-params remote-addr :remote-addr headers :headers :as request}]
+
+(defn handle-redirect-with-legacy [{redis :redis pubsub :pubsub} {{path :path} :path-params remote-addr :remote-addr headers :headers :as request}]
   (let [referer (get headers "referer")        
         legacy-path  (str "/" path)
         type (redis/wcar nil (redis/type path))]
@@ -38,7 +41,8 @@
           (let [[_ url] (redis/wcar nil
                                     (redis/hincrby path "clicks" 1)
                                     (redis/hget    path "url"))]
-            (when url (future (write-analytics! geoip path remote-addr referer)))
+            (when url
+              (thread (>!! (:channel pubsub) {:topic :click :path path :remote-addr remote-addr :referer referer})))
             (if url (redirect url) (not-found "Unknown destination.")))
 
           (= type "none")

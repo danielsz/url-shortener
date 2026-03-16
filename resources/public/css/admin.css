@@ -1,0 +1,122 @@
+/* Admin-specific styles only - no layout decisions here */
+
+* { box-sizing: border-box; margin: 0; }
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: system-ui, sans-serif;
+  font-size: var(--step-0);
+  min-block-size: 100dvh;
+}
+
+/* Nav */
+.nav__title {
+  font-size: var(--step-1);
+  font-weight: 700;
+  color: var(--color-accent);
+  padding-block: var(--space-m);
+}
+
+.nav__link {
+  display: block;
+  color: var(--color-muted);
+  text-decoration: none;
+  font-size: var(--step--1);
+  padding-block: var(--space-xs);
+}
+
+.nav__link:hover { color: var(--color-text); }
+
+/* Stat card */
+.stat__label {
+  font-size: var(--step--1);
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat__value {
+  font-size: var(--step-3);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Link card */
+.link-card__url {
+  font-size: var(--step--1);
+  color: var(--color-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.link-card__desc {
+  font-size: var(--step--1);
+  font-style: italic;
+  color: var(--color-muted);
+}
+
+.link-card__clicks {
+  font-size: var(--step-2);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-accent);
+}
+
+/* Sparkline bar chart */
+.sparkline {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  block-size: 3rem;
+}
+
+.sparkline__bar {
+  flex: 1;
+  background: var(--color-accent);
+  opacity: 0.7;
+  min-block-size: 2px;
+  block-size: calc(var(--pct) * 1%);
+  transition: block-size 0.3s ease;
+  border-radius: 2px 2px 0 0;
+}
+
+/* Country list */
+.country-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-block: var(--space-xs);
+  border-block-end: 1px solid var(--color-border);
+  font-size: var(--step--1);
+}
+
+.country-row__bar {
+  block-size: 4px;
+  background: var(--color-accent);
+  border-radius: 2px;
+  inline-size: calc(var(--pct) * 1%);
+  transition: inline-size 0.3s ease;
+}
+
+/* Live indicator */
+
+.live-dot {
+  display: inline-block;
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  border-radius: 50%;
+  background: var(--color-muted);
+  animation: none;
+}
+
+.live-dot.active {
+  background: var(--color-positive);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}

@@ -1,0 +1,50 @@
+/* Every Layout primitives - verbatim methodology, Utopia tokens for spacing */
+
+/* Stack - vertical rhythm */
+.stack { display: flex; flex-direction: column; justify-content: flex-start; }
+.stack > * + * { margin-block-start: var(--stack-space, var(--space-m)); }
+
+/* Box - a padded container with optional border */
+.box {
+  padding: var(--space-m);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+}
+
+/* Center - horizontal centering with max-width */
+.center {
+  box-sizing: content-box;
+  max-inline-size: var(--measure, 80rem);
+  margin-inline: auto;
+  padding-inline: var(--space-m);
+}
+
+/* Sidebar - content with a fixed-width sidebar */
+.sidebar { display: flex; flex-wrap: wrap; gap: var(--space-m); }
+.sidebar > .sidebar__aside {
+  flex-basis: var(--sidebar-width, 14rem);
+  flex-grow: 1;
+}
+.sidebar > .sidebar__main {
+  flex-basis: 0;
+  flex-grow: 999;
+  min-inline-size: 60%;
+}
+
+/* Switcher - equal-width row that wraps to stack below threshold */
+.switcher { display: flex; flex-wrap: wrap; gap: var(--space-m); }
+.switcher > * {
+  flex-grow: 1;
+  flex-basis: calc((var(--switcher-threshold, 30rem) - 100%) * 999);
+}
+
+/* Grid - auto-fill responsive grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(var(--grid-min, 18rem), 100%), 1fr));
+  gap: var(--space-m);
+}
+
+/* Cluster - wrapping group of inline items */
+.cluster { display: flex; flex-wrap: wrap; gap: var(--space-s); align-items: center; }
