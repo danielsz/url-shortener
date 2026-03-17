@@ -22,5 +22,5 @@
   --color-accent:   #6366f1;
   --color-positive: #22c55e;
 
-  --measure: clamp(36rem, 90vw, 48rem);
+  --measure: 65ch;
 }
