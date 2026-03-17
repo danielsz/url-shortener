@@ -1,0 +1,114 @@
+* { box-sizing: border-box; margin: 0; }
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: system-ui, sans-serif;
+  font-size: var(--step-0);
+  min-block-size: 100dvh;
+}
+
+a {
+  color: var(--color-accent);
+  text-decoration: none;
+  word-break: break-all;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Report header */
+.report__description {
+  font-size: var(--step-1);
+  font-style: italic;
+  color: var(--color-text);
+}
+
+/* Stats */
+.stat__label {
+  font-size: var(--step--1);
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat__value {
+  font-size: var(--step-3);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat__muted {
+  font-size: var(--step--1);
+  color: var(--color-muted);
+  font-style: italic;
+}
+
+/* Sparkline */
+.sparkline {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  block-size: 4rem;
+}
+
+.sparkline__bar {
+  flex: 1;
+  background: var(--color-accent);
+  opacity: 0.7;
+  min-block-size: 2px;
+  block-size: calc(var(--pct) * 1%);
+  transition: block-size 0.3s ease;
+  border-radius: 2px 2px 0 0;
+}
+
+/* Countries */
+.country-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-s);
+  padding-block: var(--space-xs);
+  border-block-end: 1px solid var(--color-border);
+  font-size: var(--step--1);
+}
+
+.country-row__bar {
+  block-size: 4px;
+  background: var(--color-accent);
+  border-radius: 2px;
+  inline-size: calc(var(--pct) * 1%);
+  transition: inline-size 0.3s ease;
+}
+
+/* Referrers */
+.referrer-row {
+  font-size: var(--step--1);
+  color: var(--color-muted);
+  padding-block: var(--space-xs);
+  border-block-end: 1px solid var(--color-border);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Live indicator */
+.live-dot {
+  display: inline-block;
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  border-radius: 50%;
+  background: var(--color-muted);
+  animation: none;
+}
+
+.live-dot.active {
+  background: var(--color-positive);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}

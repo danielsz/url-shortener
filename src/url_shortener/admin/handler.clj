@@ -16,6 +16,7 @@
      [:title "Admin Dashboard"]
      [:link {:rel "stylesheet" :href "/css/tokens.css"}]
      [:link {:rel "stylesheet" :href "/css/layout.css"}]
+     [:link {:rel "stylesheet" :href "/css/report.css"}]
      [:link {:rel "stylesheet" :href "/css/admin.css"}]
      [:script {:type "module"
                :src  "https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.8/bundles/datastar.js"}]]

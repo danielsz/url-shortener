@@ -1,7 +1,7 @@
 (ns url-shortener.handler
   (:require
    [url-shortener.shortener :refer [shorten handle-redirect handle-redirect-with-legacy]]
-   [url-shortener.report :refer [handle-report handle-create-report]]
+   [url-shortener.report :refer [handle-report handle-create-report handle-api-report handle-report-stream]]
    [url-shortener.admin.handler :refer [handle-admin handle-admin-stream]]
    [reitit.ring :as ring]
    [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
@@ -13,7 +13,9 @@
   (ring/router [["/" {:post shorten}]
                 ["/shorten" {:post shorten}]
                 ["/report"        {:post handle-create-report}]
-                ["/report/:token" {:get handle-report}]
+                ["/report/:token/stream"   {:get  (partial handle-report-stream pubsub)}]
+                ["/report/:token"          {:get  handle-report}]                
+                ["/api/report/:token" {:get handle-api-report}]
                 ["/admin"        {:get handle-admin}]
                 ["/admin/stream" {:get (partial handle-admin-stream pubsub)}]]))
 

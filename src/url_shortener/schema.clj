@@ -15,6 +15,10 @@
 (defn ips-key       [path] (str path ":ips"))
 (defn referrers-key [path] (str path ":referrers"))
 (defn daily-key     [path] (str path ":daily"))
+(defn countries-key [path] (str path ":countries"))
+(defn reports-key   [path] (str path ":reports"))
+(defn report-key    [tok]  (str "report:" tok))
 
+(def TTL-REPORT (* 14 86400))
 (def TTL-ANALYTICS (* 90 86400))
 

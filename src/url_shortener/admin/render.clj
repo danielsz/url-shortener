@@ -1,17 +1,11 @@
 (ns url-shortener.admin.render
   (:require
     [hiccup2.core :as h]
-    [taoensso.carmine :as redis]))
-
-;; -- Key helpers --------------------------------------------------------------
-
-(defn- ips-key       [path] (str path ":ips"))
-(defn- daily-key     [path] (str path ":daily"))
-(defn- countries-key [path] (str path ":countries"))
+    [taoensso.carmine :as redis]
+    [url-shortener.schema :refer [ips-key daily-key countries-key]]))
 
 ;; -- Helpers ------------------------------------------------------------------
 
-(defn- parse-long* [s] (when s (Long/parseLong s)))
 
 (defn- all-link-hashes []
   (sort (redis/wcar nil (redis/smembers "all-links"))))
@@ -19,7 +13,7 @@
 
 (defn- sparkline [daily-map]
   (let [days   (sort (keys daily-map))
-        values (map #(parse-long* (get daily-map %)) days)
+        values (map #(parse-long (get daily-map %)) days)
         max-v  (apply max 1 values)]
     [:div.sparkline
      (for [[day v] (map vector days values)]
@@ -35,7 +29,7 @@
                   (doseq [h hashes]
                     (redis/hget  h "clicks")
                     (redis/zcard (ips-key h))))
-        clicks     (->> results (take-nth 2) (map (fnil parse-long* "0")))
+        clicks     (->> results (take-nth 2) (map (fnil parse-long "0")))
         unique-ips (->> results (drop 1) (take-nth 2))]
     (str (h/html
       [:div#stats.switcher
@@ -80,7 +74,7 @@
                                 (redis/hgetall (countries-key h))))))
                      (reduce (fn [acc m]
                                (merge-with + acc
-                                 (update-vals m parse-long*)))
+                                 (update-vals m parse-long)))
                              {}))
         sorted  (sort-by val > totals)
         max-v   (apply max 1 (vals totals))]
