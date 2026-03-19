@@ -1,33 +1,44 @@
 (ns url-shortener.shortener
   (:require [taoensso.carmine :as redis]
-            [clojure.core.async :as a :refer [<!! >!! >! <! chan thread timeout go]]
+            [clojure.core.async :as a]
             [clojure.tools.logging :as log]
             [url-shortener.analytics :refer [write-analytics!]]
-            [url-shortener.shared :refer [hash-url url-validator]]
-            [url-shortener.schema :refer [user-key]]
+            [url-shortener.shared.utils :refer [hash-url url-validator epoch-now]]
+            [url-shortener.schema :refer [owner-key group-links-key default-group-id group-key owner-groups-key]]
             [ring.util.response :refer [response bad-request not-found redirect]]))
 
 
-(defn shorten [{{:keys [url user description] :or {user "anonymous" description ""}} :params :as request}]
+(defn shorten [{{:keys [url owner-id group-id description]
+                 :or   {owner-id "anonymous" description ""}} :params}]
   (if (.isValid url-validator url)
-    (let [path (hash-url url)]
+    (let [path     (hash-url url)
+          group-id (if group-id
+                     (str owner-id ":" group-id)
+                     (default-group-id owner-id))]
       (redis/wcar nil
-                  (redis/hset path "url" url "user" user "description" description)
-                  (redis/hsetnx path "clicks" 0)  
-                  (redis/sadd  (user-key user) path)
-                  (redis/sadd   "all-links" path))
+        (redis/hset   path "url"         url
+                           "owner-id"    owner-id
+                           "group-id"    group-id
+                           "description" description)
+        (redis/hsetnx path "clicks" 0)
+        (redis/hsetnx (group-key group-id) "name"     group-id)
+        (redis/hsetnx (group-key group-id) "owner-id" owner-id)
+        (redis/hsetnx (group-key group-id) "created"  (epoch-now))
+        (redis/sadd   (owner-groups-key owner-id) group-id)
+        (redis/sadd   (group-links-key group-id) path)
+        (redis/sadd   "all-links" path))
       (response (str (System/getProperty "shortener.service") path)))
-    (bad-request "Invalid Url provided (tuppu.net)")))
-
+    (bad-request "Invalid URL provided")))
 
 (defn handle-redirect [{redis :redis pubsub :pubsub} {{path :path} :path-params remote-addr :remote-addr headers :headers :as request}]
   (let [referer (get headers "referer")        
-        [rc url] (redis/wcar nil
-                      (redis/hincrby path "clicks" 1)
-                      (redis/hget    path "url"))]
+        [rc url group-id] (redis/wcar nil
+                                      (redis/hincrby path "clicks" 1)
+                                      (redis/hget    path "url")
+                                      (redis/hget    path "group-id"))]
     (log/debug "rc" rc)
     (when url
-      (thread (>!! (:channel pubsub) {:topic :click :path path :remote-addr remote-addr :referer referer})))
+      (a/thread (a/>!! (:channel pubsub) {:topic :click :path path :group-id group-id :remote-addr remote-addr :referer referer})))
     (if url
       (redirect url)
       (not-found "Unknown destination."))))
@@ -39,11 +50,12 @@
         type (redis/wcar nil (redis/type path))]
     (cond
           (= type "hash")
-          (let [[_ url] (redis/wcar nil
+          (let [[_ url group-id] (redis/wcar nil
                                     (redis/hincrby path "clicks" 1)
-                                    (redis/hget    path "url"))]
+                                    (redis/hget    path "url")
+                                     (redis/hget   path "group-id"))]
             (when url
-              (thread (>!! (:channel pubsub) {:topic :click :path path :remote-addr remote-addr :referer referer})))
+              (a/thread (a/>!! (:channel pubsub) {:topic :click :path path :remote-addr remote-addr :group-id group-id :referer referer})))
             (if url (redirect url) (not-found "Unknown destination.")))
 
           (= type "none")
@@ -56,6 +68,3 @@
 
           :else
           (not-found "Unknown destination (including legacy)."))))
-
-
-

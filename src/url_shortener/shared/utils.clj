@@ -1,4 +1,4 @@
-(ns url-shortener.shared
+(ns url-shortener.shared.utils
   (:require [taoensso.carmine :as redis]
             [url-shortener.schema :refer [report-key]])
   (:import org.apache.commons.validator.routines.InetAddressValidator
@@ -6,7 +6,8 @@
            clojure.lang.Murmur3
            java.security.SecureRandom
            java.util.Base64
-           java.time.Instant))
+           java.time.Instant
+           java.time.LocalDate))
 
 (def ip-validator  (InetAddressValidator/getInstance))
 (def url-validator (UrlValidator. (into-array ["http" "https"])))
@@ -26,3 +27,5 @@
 
 (defn epoch-now []
   (.getEpochSecond (Instant/now)))
+
+(defn today [] (str (LocalDate/now)))

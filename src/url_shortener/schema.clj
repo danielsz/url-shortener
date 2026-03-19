@@ -2,23 +2,71 @@
 
 ;; -- Key schema ---------------------------------------------------------------
 ;;
-;; <hash>            hash    url, user, description, clicks TTL-LINK
-;; <hash>:ips        zset    ip → last-seen epoch      TTL-ANALYTICS
-;; <hash>:referrers  list    referer strings           TTL-ANALYTICS
-;; <hash>:daily      hash    "yyyy-MM-dd" → count      TTL-ANALYTICS
-;; <hash>:reports    set     share tokens              no TTL
-;; <hash>:countries  hash    "ISO-code" → count        TTL-ANALYTICS
-;; user:<u>:links     set     paths owned by user       no TTL
-;; report:<token>     hash    owner, path, created      TTL-REPORT
+;; Links
+;; <hash>               hash    url, group-id, owner-id, description, clicks    no TTL
+;; <hash>:ips           zset    ip → last-seen epoch                            TTL-ANALYTICS
+;; <hash>:referrers     list    referer strings                                 TTL-ANALYTICS
+;; <hash>:daily         hash    "yyyy-MM-dd" → count                           TTL-ANALYTICS
+;; <hash>:countries     hash    "ISO-code" → count                             TTL-ANALYTICS
+;; <hash>:reports       set     report tokens                                   no TTL
+;;
+;; Groups
+;; group:<group-id>             hash    name, owner-id, created                 no TTL
+;; group:<group-id>:links       set     link hashes                             no TTL
+;; group:<group-id>:daily       hash    "yyyy-MM-dd" → count                   TTL-ANALYTICS
+;; group:<group-id>:countries   hash    "ISO-code" → count                     TTL-ANALYTICS
+;; group:<group-id>:ips         zset    ip → last-seen epoch                   TTL-ANALYTICS
+;; group:<group-id>:reports     set     report tokens                           no TTL
+;;
+;; Owners
+;; owner:<owner-id>             hash    name, email, plan, created              no TTL
+;; owner:<owner-id>:groups      set     group IDs                               no TTL
+;;
+;; API keys
+;; apikey:<key>                 hash    owner-id, group-id, name, created, active   no TTL
+;;
+;; Reports
+;; report:<token>               hash    type, target-id, owner-id, created      TTL-REPORT
+;;
+;; Indexes
+;; all-links                    set     all link hashes                         no TTL
 
-(defn user-key      [user] (str "user:" user ":links"))
-(defn ips-key       [path] (str path ":ips"))
-(defn referrers-key [path] (str path ":referrers"))
-(defn daily-key     [path] (str path ":daily"))
-(defn countries-key [path] (str path ":countries"))
-(defn reports-key   [path] (str path ":reports"))
-(defn report-key    [tok]  (str "report:" tok))
+;; -- TTLs ---------------------------------------------------------------------
 
-(def TTL-REPORT (* 14 86400))
+(def TTL-REPORT    (* 14 86400))
 (def TTL-ANALYTICS (* 90 86400))
+
+;; -- Link key helpers ---------------------------------------------------------
+
+(defn ips-key        [path] (str path ":ips"))
+(defn referrers-key  [path] (str path ":referrers"))
+(defn daily-key      [path] (str path ":daily"))
+(defn countries-key  [path] (str path ":countries"))
+(defn reports-key    [path] (str path ":reports"))
+
+;; -- Group key helpers --------------------------------------------------------
+
+(defn group-key          [group-id] (str "group:" group-id))
+(defn group-links-key    [group-id] (str "group:" group-id ":links"))
+(defn group-daily-key    [group-id] (str "group:" group-id ":daily"))
+(defn group-countries-key [group-id] (str "group:" group-id ":countries"))
+(defn group-ips-key      [group-id] (str "group:" group-id ":ips"))
+(defn group-reports-key  [group-id] (str "group:" group-id ":reports"))
+
+;; -- Owner key helpers --------------------------------------------------------
+
+(defn owner-key        [owner-id] (str "owner:" owner-id))
+(defn owner-groups-key [owner-id] (str "owner:" owner-id ":groups"))
+
+;; -- API key helpers ----------------------------------------------------------
+
+(defn apikey-key [key] (str "apikey:" key))
+
+;; -- Report key helpers -------------------------------------------------------
+
+(defn report-key [tok] (str "report:" tok))
+
+;; -- Default group ------------------------------------------------------------
+
+(defn default-group-id [owner-id] (str "default:" owner-id))
 
