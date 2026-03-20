@@ -9,6 +9,14 @@
       (redis/wcar nil (apply redis/sadd "all-links" hashes)))
     (println "populated all-links with" (count hashes) "keys")))
 
+(defn populate-all-groups! []
+  (let [groups (->> (redis/wcar nil (redis/keys "group:*"))
+                  (remove #(re-find #":(links|daily|countries|ips|reports)$" %))
+                  (map #(subs % 6)))]  ; strip "group:" prefix
+  (when (seq groups)
+    (redis/wcar nil (apply redis/sadd "all-groups" groups)))
+  (println "populated all-groups with" (count groups) "groups")))
+
 
 (defn inspect-keyspace []
   (let [all-keys (redis/wcar nil (redis/keys "*"))

@@ -2,7 +2,76 @@
   (:require
     [hiccup2.core :as h]
     [taoensso.carmine :as redis]
-    [url-shortener.schema :refer [ips-key daily-key countries-key]]))
+    [url-shortener.schema :refer [ips-key daily-key countries-key group-key group-links-key group-ips-key]]))
+
+(defn- all-group-ids []
+  (redis/wcar nil (redis/smembers "all-groups")))
+
+(defn- group-click-count [group-id]
+  (parse-long (or (redis/wcar nil (redis/hget (group-key group-id) "clicks")) "0")))
+
+(defn- sorted-groups []
+  (->> (all-group-ids)
+       (map (fn [group-id]
+              (let [[name clicks unique-ips]
+                    (redis/wcar nil
+                      (redis/hget  (group-key group-id) "name")
+                      (redis/hget  (group-key group-id) "clicks")
+                      (redis/zcard (group-ips-key group-id)))]
+                {:group-id   group-id
+                 :name       name
+                 :clicks     (parse-long (or clicks "0"))
+                 :unique-ips (or unique-ips 0)
+                 :link-count (redis/wcar nil (redis/scard (group-links-key group-id)))})))
+       (sort-by :clicks >)))
+
+(defn render-stats []
+  (let [groups     (all-group-ids)
+        total-links (redis/wcar nil (redis/scard "all-links"))
+        results    (redis/wcar nil
+                               (doseq [g groups]
+                                 (redis/hget (group-key g) "clicks")
+                                 (redis/zcard (group-ips-key g))))
+        clicks     (->> results (take-nth 2) (map #(parse-long (or % "0"))))
+        unique-ips (->> results (drop 1) (take-nth 2) (map #(or % 0)))]
+    (str (h/html
+      [:div {:id "stats" :class "switcher"}
+       [:div.box.stack
+        [:span.stat__label "Total Groups"]
+        [:span.stat__value (count groups)]]
+       [:div.box.stack
+        [:span.stat__label "Total Links"]
+        [:span.stat__value total-links]]
+       [:div.box.stack
+        [:span.stat__label "Total Clicks"]
+        [:span.stat__value (apply + clicks)]]
+       [:div.box.stack
+        [:span.stat__label "Unique Visitors"]
+        [:span.stat__value (apply + unique-ips)]]]))))
+
+(defn render-groups []
+  (let [groups (sorted-groups)]
+    (str (h/html
+      [:div {:id "groups" :class "stack"}
+       [:span.stat__label "Groups"]
+       (if (seq groups)
+         (for [{:keys [group-id name clicks unique-ips link-count]} groups]
+           [:a.group-card.box.stack
+            {:href                    (str "/admin/group/" group-id)
+             :style                   "--stack-space: var(--space-s)"
+             :data-on:click           (str "@get('/admin/group/" group-id "')")}
+            [:div.cluster
+             [:span.group-card__name name]
+             [:span.stat__label (str link-count " links")]]
+            [:div.switcher
+             [:div.stack
+              [:span.stat__label "Clicks"]
+              [:span.group-card__clicks clicks]]
+             [:div.stack
+              [:span.stat__label "Unique Visitors"]
+              [:span.group-card__clicks unique-ips]]]])
+         [:span.stat__muted "No groups yet"])]))))
+
 
 ;; -- Helpers ------------------------------------------------------------------
 
@@ -23,25 +92,7 @@
 
 ;; -- Render functions ---------------------------------------------------------
 
-(defn render-stats []
-  (let [hashes  (all-link-hashes)
-        results (redis/wcar nil
-                  (doseq [h hashes]
-                    (redis/hget  h "clicks")
-                    (redis/zcard (ips-key h))))
-        clicks     (->> results (take-nth 2) (map (fnil parse-long "0")))
-        unique-ips (->> results (drop 1) (take-nth 2))]
-    (str (h/html
-      [:div#stats.switcher
-       [:div.box.stack
-        [:span.stat__label "Total Links"]
-        [:span.stat__value (count hashes)]]
-       [:div.box.stack
-        [:span.stat__label "Total Clicks"]
-        [:span.stat__value (apply + clicks)]]
-       [:div.box.stack
-        [:span.stat__label "Unique Visitors"]
-        [:span.stat__value (apply + unique-ips)]]]))))
+
 
 (defn render-link-card [path]
   (let [[url desc clicks daily]

@@ -4,6 +4,7 @@
    [url-shortener.report :refer [handle-report-page handle-create-report  handle-report-stream]]
    [url-shortener.reports.api :refer [handle-api-report]]
    [url-shortener.admin.handler :refer [handle-admin handle-admin-stream]]
+   [url-shortener.admin.group-detail :refer [handle-group-detail handle-group-stream]]
    [reitit.ring :as ring]
    [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
    [muuntaja.middleware :refer [wrap-params wrap-format]]
@@ -18,7 +19,9 @@
                 ["/report/:token"          {:get  handle-report-page}]
                 ["/api/report/:token" {:get handle-api-report}]
                 ["/admin"        {:get handle-admin}]
-                ["/admin/stream" {:get (partial handle-admin-stream pubsub)}]]))
+                ["/admin/stream" {:get (partial handle-admin-stream pubsub)}]
+                ["/admin/group/:group-id"         {:get handle-group-detail}]
+                ["/admin/group/:group-id/stream"  {:get (partial handle-group-stream pubsub)}]]))
 
 (defn default-handler [component]
   (ring/routes

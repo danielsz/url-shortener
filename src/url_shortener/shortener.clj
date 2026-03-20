@@ -26,7 +26,8 @@
         (redis/hsetnx (group-key group-id) "created"  (epoch-now))
         (redis/sadd   (owner-groups-key owner-id) group-id)
         (redis/sadd   (group-links-key group-id) path)
-        (redis/sadd   "all-links" path))
+        (redis/sadd   "all-links" path)
+        (redis/sadd   "all-groups" group-id))
       (response (str (System/getProperty "shortener.service") path)))
     (bad-request "Invalid URL provided")))
 

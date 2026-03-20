@@ -1,7 +1,7 @@
 (ns url-shortener.admin.handler
   (:require
     [hiccup2.core :as h]
-    [clojure.core.async :as a :refer [chan sliding-buffer <!! sub unsub close! thread]]
+    [clojure.core.async :as a :refer [chan sliding-buffer <!! sub unsub close!]]
     [hiccup.page :refer [html5]]
     [clojure.tools.logging :as log]
     [starfederation.datastar.clojure.api :as d*]
@@ -26,7 +26,7 @@
        [:nav.sidebar__aside.stack
         [:div.nav__title "Admin"]
         [:a.nav__link {:href "#stats"}     "Overview"]
-        [:a.nav__link {:href "#links"}     "Links"]
+        [:a.nav__link {:href "#groups"}     "Groups"]
         [:a.nav__link {:href "#countries"} "Countries"]]
        [:main.sidebar__main.stack {:data-signals "{connected: false}" :data-init "@get('/admin/stream')"}
         [:div.cluster
@@ -38,38 +38,50 @@
           [:span.stat__label "Total Links"]
           [:span.stat__value "--"]]
          [:div.box.stack
+          [:span.stat__label "Total Groups"]
+          [:span.stat__value "--"]]
+         [:div.box.stack
           [:span.stat__label "Total Clicks"]
           [:span.stat__value "--"]]
          [:div.box.stack
           [:span.stat__label "Unique Visitors"]
           [:span.stat__value "--"]]]
-        [:div.grid {:id "links"}]
+        [:div.stack {:id "groups"}]
         [:div {:id "countries"}]]]]])) ; main, sidebar, center, body close + html5 + defn
 
+
 (defn handle-admin-stream [pubsub request]
-  (hk-gen/->sse-response request
-    {hk-gen/on-open
-     (fn [sse]
-       (let [ch (chan (sliding-buffer 10))
-             cleanup! (fn [e]
-                        (log/debug "admin stream closed" (.getMessage e))
-                        (unsub (:publication pubsub) :click ch)
-                        (close! ch))]
-         (sub (:publication pubsub) :click ch)
-         (try
-           (d*/patch-signals! sse "{\"connected\": true}")
-           (d*/patch-elements! sse (render/render-stats))
-           (d*/patch-elements! sse (render/render-links))
-           (d*/patch-elements! sse (render/render-countries))
-           (loop []
-             (when-let [event (<!! ch)]
-               (try
-                 (d*/patch-elements! sse (render/render-stats))
-                 (d*/patch-elements! sse (render/render-links))
-                 (d*/patch-elements! sse (render/render-countries))
-                 (catch Exception e (cleanup! e)))
-               (recur)))
-           (catch Exception e (cleanup! e)))))}))
+  (let [ch-atom  (atom nil)
+        cleanup! (fn []
+                   (when-let [ch @ch-atom]
+                     (log/debug "admin stream closed")
+                     (unsub (:publication pubsub) :click ch)
+                     (close! ch)
+                     (reset! ch-atom nil)))]
+    (hk-gen/->sse-response request
+      {hk-gen/on-open
+       (fn [sse]
+         (let [ch (chan (sliding-buffer 10))]
+           (reset! ch-atom ch)
+           (sub (:publication pubsub) :click ch)
+           (try
+             (d*/patch-signals! sse "{\"connected\": true}")
+             (d*/patch-elements! sse (render/render-stats))
+             (d*/patch-elements! sse (render/render-groups))
+             (d*/patch-elements! sse (render/render-countries))
+             (loop []
+               (when-let [event (<!! ch)]
+                 (try
+                   (d*/patch-elements! sse (render/render-stats))
+                   (d*/patch-elements! sse (render/render-groups))
+                   (d*/patch-elements! sse (render/render-countries))
+                   (catch Exception e (log/error "push failed" (.getMessage e))))
+                 (recur)))
+             (catch Exception e (log/error "stream failed" (.getMessage e))))))
+       hk-gen/on-close
+       (fn [sse status]
+         (log/debug "admin stream on-close" status)
+         (cleanup!))})))
 
 
 (defn handle-admin [_]

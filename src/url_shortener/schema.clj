@@ -30,7 +30,7 @@
 ;;
 ;; Indexes
 ;; all-links                    set     all link hashes                         no TTL
-
+;; all-groups                   set     all group hashes                        no TTL
 ;; -- TTLs ---------------------------------------------------------------------
 
 (def TTL-REPORT    (* 14 86400))
@@ -52,6 +52,11 @@
 (defn group-countries-key [group-id] (str "group:" group-id ":countries"))
 (defn group-ips-key      [group-id] (str "group:" group-id ":ips"))
 (defn group-reports-key  [group-id] (str "group:" group-id ":reports"))
+
+;; -- All ------------------------------------------------------------------------
+
+(def all-groups-key "all-groups")
+(def all-links-key  "all-links")
 
 ;; -- Owner key helpers --------------------------------------------------------
 
