@@ -21,7 +21,6 @@
                            "group-id"    group-id
                            "description" description)
         (redis/hsetnx path "clicks" 0)
-        (redis/hsetnx (group-key group-id) "name"     group-id)
         (redis/hsetnx (group-key group-id) "owner-id" owner-id)
         (redis/hsetnx (group-key group-id) "created"  (epoch-now))
         (redis/sadd   (owner-groups-key owner-id) group-id)

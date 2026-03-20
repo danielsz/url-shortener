@@ -2,7 +2,8 @@
   (:require
     [hiccup2.core :as h]
     [taoensso.carmine :as redis]
-    [url-shortener.schema :refer [ips-key daily-key countries-key group-key group-links-key group-ips-key]]))
+    [url-shortener.schema :refer [ips-key daily-key countries-key group-key group-links-key group-ips-key]]
+    [url-shortener.shared.utils :refer [display-name]]))
 
 (defn- all-group-ids []
   (redis/wcar nil (redis/smembers "all-groups")))
@@ -13,16 +14,16 @@
 (defn- sorted-groups []
   (->> (all-group-ids)
        (map (fn [group-id]
-              (let [[name clicks unique-ips]
+              (let [[clicks unique-ips link-count]
                     (redis/wcar nil
-                      (redis/hget  (group-key group-id) "name")
                       (redis/hget  (group-key group-id) "clicks")
-                      (redis/zcard (group-ips-key group-id)))]
+                      (redis/zcard (group-ips-key group-id))
+                      (redis/scard (group-links-key group-id)))]
                 {:group-id   group-id
-                 :name       name
+                 :name       (display-name group-id)
                  :clicks     (parse-long (or clicks "0"))
                  :unique-ips (or unique-ips 0)
-                 :link-count (redis/wcar nil (redis/scard (group-links-key group-id)))})))
+                 :link-count (or link-count 0)})))
        (sort-by :clicks >)))
 
 (defn render-stats []
@@ -55,13 +56,13 @@
       [:div {:id "groups" :class "stack"}
        [:span.stat__label "Groups"]
        (if (seq groups)
-         (for [{:keys [group-id name clicks unique-ips link-count]} groups]
+         (for [{:keys [group-id clicks unique-ips link-count]} groups]
            [:a.group-card.box.stack
             {:href                    (str "/admin/group/" group-id)
              :style                   "--stack-space: var(--space-s)"
              :data-on:click           (str "@get('/admin/group/" group-id "')")}
             [:div.cluster
-             [:span.group-card__name name]
+             [:span.group-card__name (display-name group-id)]
              [:span.stat__label (str link-count " links")]]
             [:div.switcher
              [:div.stack

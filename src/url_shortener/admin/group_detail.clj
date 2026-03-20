@@ -7,8 +7,8 @@
     [clojure.tools.logging :as log]
     [starfederation.datastar.clojure.api :as d*]
     [starfederation.datastar.clojure.adapter.http-kit :refer [->sse-response on-open on-close]]
-    [url-shortener.schema :refer [group-key group-links-key group-ips-key
-                                  group-daily-key group-countries-key]]))
+    [url-shortener.schema :refer [group-key group-links-key group-ips-key]]
+    [url-shortener.shared.utils :refer [display-name]]))
 
 (defn- sorted-links [group-id]
   (let [paths   (redis/wcar nil (redis/smembers (group-links-key group-id)))
@@ -62,12 +62,12 @@
               [:div.link-card__desc desc])])
          [:span.stat__muted "No links yet"])]))))
 
-(defn- group-detail-page [group-id group-name]
+(defn- group-detail-page [group-id]
   (html5
     [:head
      [:meta {:charset "utf-8"}]
      [:meta {:name "viewport" :content "width=device-width, initial-scale=1"}]
-     [:title (str group-name " — Links")]
+     [:title (str (display-name group-id) " — Links")]
      [:link {:rel "stylesheet" :href "/css/tokens.css"}]
      [:link {:rel "stylesheet" :href "/css/layout.css"}]
      [:link {:rel "stylesheet" :href "/css/admin.css"}]
@@ -79,7 +79,7 @@
       [:div.sidebar
        [:nav.sidebar__aside.stack
         [:a.nav__link {:href "/admin"} "← Admin"]
-        [:div.nav__title group-name]
+        [:div.nav__title (display-name group-id)]
         [:a.nav__link {:href "#group-stats"}  "Overview"]
         [:a.nav__link {:href "#group-links"}  "Links"]]
        [:main.sidebar__main.stack
@@ -93,10 +93,9 @@
         [:div {:id "group-links"}]]]]]))
 
 (defn handle-group-detail [{{group-id :group-id} :path-params}]
-  (let [group-name (redis/wcar nil (redis/hget (group-key group-id) "name"))]
-    {:status  200
-     :headers {"Content-Type" "text/html"}
-     :body    (group-detail-page group-id group-name)}))
+  {:status  200
+   :headers {"Content-Type" "text/html"}
+   :body    (group-detail-page group-id)})
 
 (defn handle-group-stream [pubsub {{group-id :group-id} :path-params :as request}]
   (let [ch-atom  (atom nil)

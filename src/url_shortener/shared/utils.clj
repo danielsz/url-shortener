@@ -29,3 +29,6 @@
   (.getEpochSecond (Instant/now)))
 
 (defn today [] (str (LocalDate/now)))
+
+(defn display-name [group-id]
+  (last (clojure.string/split group-id #":")))

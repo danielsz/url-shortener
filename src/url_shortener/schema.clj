@@ -11,7 +11,7 @@
 ;; <hash>:reports       set     report tokens                                   no TTL
 ;;
 ;; Groups
-;; group:<group-id>             hash    name, owner-id, created                 no TTL
+;; group:<group-id>             hash    owner-id, created                 no TTL
 ;; group:<group-id>:links       set     link hashes                             no TTL
 ;; group:<group-id>:daily       hash    "yyyy-MM-dd" → count                   TTL-ANALYTICS
 ;; group:<group-id>:countries   hash    "ISO-code" → count                     TTL-ANALYTICS

@@ -8,6 +8,7 @@
    [ring.util.response :refer [response status]]
    
    [url-shortener.schema :refer [report-key group-links-key group-daily-key group-countries-key group-key group-ips-key group-reports-key TTL-REPORT]]
+   [url-shortener.shared.utils :refer [display-name]]
    [url-shortener.shared.sse-fragments :refer [sparkline]]))
 
 (defn create-group-report! [owner-id group-id]
@@ -25,12 +26,12 @@
         (response (str (System/getProperty "shortener.service") "report/" token)))
       (status 403))))
 
-(defn group-report-page [token group-id group-name]
+(defn group-report-page [token group-id]
   (html5
     [:head
      [:meta {:charset "utf-8"}]
      [:meta {:name "viewport" :content "width=device-width, initial-scale=1"}]
-     [:title (str group-name " — Analytics")]
+     [:title (str (display-name group-id) " — Analytics")]
      [:link {:rel "stylesheet" :href "/css/tokens.css"}]
      [:link {:rel "stylesheet" :href "/css/layout.css"}]
      [:link {:rel "stylesheet" :href "/css/report.css"}]
@@ -42,7 +43,7 @@
        {:data-signals "{connected: false}"
         :data-init    (str "@get('/report/" token "/stream')")}
        [:div.box
-        [:span.report__description group-name]]
+        [:span.report__description (display-name group-id)]]
        [:div.cluster
         [:span.live-dot {:data-class "{active: $connected}"}]
         [:span.stat__label "Live"]]
@@ -52,11 +53,10 @@
        [:div {:id "links"}]]]]))
 
 (defn handle-group-report [token report]
-  (let [group-id   (get report "target-id")
-        group-name (redis/wcar nil (redis/hget (group-key group-id) "name"))]
+  (let [group-id   (get report "target-id")]
     {:status  200
      :headers {"Content-Type" "text/html"}
-     :body    (group-report-page token group-id group-name)}))
+     :body    (group-report-page token group-id)}))
 
 (defn render-stats [group-id]
   (let [link-count (redis/wcar nil (redis/scard (group-links-key group-id)))
