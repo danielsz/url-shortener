@@ -59,8 +59,7 @@
                                "link"  (= (:path event) target-id)
                                "group" (= (:group-id event) target-id)))]
              (async/sub (:publication pubsub) :click ch)
-             (try
-               (d*/patch-signals! sse "{\"connected\": true}")
+             (try               
                (push-all!)
                (loop []
                  (when-let [event (async/<!! ch)]

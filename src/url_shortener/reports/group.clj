@@ -3,12 +3,11 @@
    [hiccup2.core :as h]
    [hiccup.page :refer [html5]]
    [taoensso.carmine :as redis]
-   [url-shortener.shared.utils :refer [generate-token epoch-now]]
+   [url-shortener.shared.utils :refer [generate-token epoch-now display-name]]
    [clojure.tools.logging :as log]
    [ring.util.response :refer [response status]]
    
    [url-shortener.schema :refer [report-key group-links-key group-daily-key group-countries-key group-key group-ips-key group-reports-key TTL-REPORT]]
-   [url-shortener.shared.utils :refer [display-name]]
    [url-shortener.shared.sse-fragments :refer [sparkline]]))
 
 (defn create-group-report! [owner-id group-id]
@@ -41,7 +40,8 @@
      [:div.center
       [:div.stack
        {:data-signals "{connected: false}"
-        :data-init    (str "@get('/report/" token "/stream')")}
+        :data-init    (str "@get('/report/" token "/stream')")
+        :data-on:datastar-fetch "el === evt.detail.el && ((evt.detail.type.startsWith('datastar') && ($connected = true)) || (['retrying', 'error', 'finished'].includes(evt.detail.type) && ($connected = false)))"}
        [:div.box
         [:span.report__description (display-name group-id)]]
        [:div.cluster
@@ -104,11 +104,12 @@
 
 (defn render-links [group-id]
   (let [paths  (redis/wcar nil (redis/smembers (group-links-key group-id)))
-        links  (redis/wcar nil
-                           (run! (fn [p]
-                                   (redis/hget p "url")
-                                   (redis/hget p "description")
-                                   (redis/hget p "clicks")) paths))]
+        links  (when (seq paths)
+                 (redis/wcar nil
+                             (doseq [p paths]
+                               (redis/hget p "url")
+                               (redis/hget p "description")
+                               (redis/hget p "clicks"))))]
     (str (h/html
       [:div {:id "links" :class "stack"}
        [:span.stat__label "Links"]

@@ -19,7 +19,8 @@
      [:link {:rel "stylesheet" :href "/css/report.css"}]
      [:link {:rel "stylesheet" :href "/css/admin.css"}]
      [:script {:type "module"
-               :src  "https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.8/bundles/datastar.js"}]]
+               :src  "https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.8/bundles/datastar.js"}]
+     [:script "window.addEventListener('pageshow', function(event) { if (event.persisted) { window.location.reload(); } });"]]
     [:body
      [:div.center
       [:div.sidebar
@@ -28,7 +29,9 @@
         [:a.nav__link {:href "#stats"}     "Overview"]
         [:a.nav__link {:href "#groups"}     "Groups"]
         [:a.nav__link {:href "#countries"} "Countries"]]
-       [:main.sidebar__main.stack {:data-signals "{connected: false}" :data-init "@get('/admin/stream')"}
+       [:main.sidebar__main.stack {:data-init           "@get('/admin/stream')"
+                                   :data-signals        "{connected: false}"
+                                   :data-on:datastar-fetch "el === evt.detail.el && ((evt.detail.type.startsWith('datastar') && ($connected = true)) || (['retrying', 'error', 'finished'].includes(evt.detail.type) && ($connected = false)))"}
         [:div.cluster
          [:span.live-dot {:data-class "{active: $connected}"}]
          [:span {:style "font-size: var(--step--1); color: var(--color-muted)"}
@@ -65,7 +68,6 @@
            (reset! ch-atom ch)
            (sub (:publication pubsub) :click ch)
            (try
-             (d*/patch-signals! sse "{\"connected\": true}")
              (d*/patch-elements! sse (render/render-stats))
              (d*/patch-elements! sse (render/render-groups))
              (d*/patch-elements! sse (render/render-countries))
@@ -86,5 +88,6 @@
 
 (defn handle-admin [_]
   {:status  200
-   :headers {"Content-Type" "text/html"}
+   :headers {"Content-Type" "text/html"
+             "Cache-Control" "no-store"}
    :body    (admin-page)})

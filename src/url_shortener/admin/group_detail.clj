@@ -12,12 +12,12 @@
 
 (defn- sorted-links [group-id]
   (let [paths   (redis/wcar nil (redis/smembers (group-links-key group-id)))
-        results (redis/wcar nil
-                  (run! (fn [p]
-                          (redis/hget p "url")
-                          (redis/hget p "description")
-                          (redis/hget p "clicks"))
-                        paths))]
+        results (when (seq paths)
+                  (redis/wcar nil
+                              (doseq [p paths]
+                                (redis/hget p "url")
+                                (redis/hget p "description")
+                                (redis/hget p "clicks"))))]
     (->> (map vector paths (partition 3 results))
          (map (fn [[path [url desc clicks]]]
                 {:path   path
@@ -73,7 +73,8 @@
      [:link {:rel "stylesheet" :href "/css/admin.css"}]
      [:link {:rel "stylesheet" :href "/css/report.css"}]
      [:script {:type "module"
-               :src  "https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.8/bundles/datastar.js"}]]
+               :src  "https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.8/bundles/datastar.js"}]
+     [:script "window.addEventListener('pageshow', function(event) { if (event.persisted) { window.location.reload(); } });"]]
     [:body
      [:div.center
       [:div.sidebar
@@ -82,9 +83,9 @@
         [:div.nav__title (display-name group-id)]
         [:a.nav__link {:href "#group-stats"}  "Overview"]
         [:a.nav__link {:href "#group-links"}  "Links"]]
-       [:main.sidebar__main.stack
-        {:data-init    (str "@get('/admin/group/" group-id "/stream')")
-         :data-signals "{connected: false}"}
+       [:main.sidebar__main.stack {:data-init           (str "@get('/admin/group/" group-id "/stream')")
+                                   :data-signals        "{connected: false}"
+                                   :data-on:datastar-fetch "el === evt.detail.el && ((evt.detail.type.startsWith('datastar') && ($connected = true)) || (['retrying', 'error', 'finished'].includes(evt.detail.type) && ($connected = false)))"}
         [:div.cluster
          [:span.live-dot {:data-class "{active: $connected}"}]
          [:span {:style "font-size: var(--step--1); color: var(--color-muted)"}
@@ -94,7 +95,8 @@
 
 (defn handle-group-detail [{{group-id :group-id} :path-params}]
   {:status  200
-   :headers {"Content-Type" "text/html"}
+   :headers {"Content-Type" "text/html"
+             "Cache-Control" "no-store"}
    :body    (group-detail-page group-id)})
 
 (defn handle-group-stream [pubsub {{group-id :group-id} :path-params :as request}]
@@ -111,7 +113,6 @@
            (reset! ch-atom ch)
            (async/sub (:publication pubsub) :click ch)
            (try
-             (d*/patch-signals! sse "{\"connected\": true}")
              (d*/patch-elements! sse (render-group-stats group-id))
              (d*/patch-elements! sse (render-group-links group-id))
              (loop []

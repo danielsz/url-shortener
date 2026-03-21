@@ -27,7 +27,8 @@
      [:div.center
       [:div.stack
        {:data-signals "{connected: false}"
-        :data-init    (str "@get('/report/" token "/stream')")}
+        :data-init    (str "@get('/report/" token "/stream')")
+        :data-on:datastar-fetch "el === evt.detail.el && ((evt.detail.type.startsWith('datastar') && ($connected = true)) || (['retrying', 'error', 'finished'].includes(evt.detail.type) && ($connected = false)))"}
        [:div.box.stack
         [:span.stat__label "Short Link"]
         [:a {:href (str (System/getProperty "shortener.service") path)}
