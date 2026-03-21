@@ -3,6 +3,7 @@
    [url-shortener.shortener :refer [shorten handle-redirect handle-redirect-with-legacy]]
    [url-shortener.report :refer [handle-report-page handle-create-report  handle-report-stream]]
    [url-shortener.reports.api :refer [handle-api-report]]
+   [url-shortener.reports.link :refer [handle-link-detail]]
    [url-shortener.admin.handler :refer [handle-admin handle-admin-stream]]
    [url-shortener.admin.group-detail :refer [handle-group-detail handle-group-stream]]
    [reitit.ring :as ring]
@@ -21,7 +22,8 @@
                 ["/admin"        {:get handle-admin}]
                 ["/admin/stream" {:get (partial handle-admin-stream pubsub)}]
                 ["/admin/group/:group-id"         {:get handle-group-detail}]
-                ["/admin/group/:group-id/stream"  {:get (partial handle-group-stream pubsub)}]]))
+                ["/admin/group/:group-id/stream"  {:get (partial handle-group-stream pubsub)}]
+                ["/admin/link/:path"             {:get  handle-link-detail}]]))
 
 (defn default-handler [component]
   (ring/routes

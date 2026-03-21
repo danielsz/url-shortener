@@ -128,3 +128,4 @@
        (fn [sse status]
          (log/debug "group stream closed" group-id status)
          (cleanup!))})))
+

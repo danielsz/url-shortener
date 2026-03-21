@@ -6,7 +6,7 @@
    [clojure.tools.logging :as log]
    [url-shortener.shared.utils :refer [generate-token epoch-now]]
    [url-shortener.schema :refer [reports-key report-key ips-key referrers-key daily-key countries-key TTL-REPORT]]
-   [ring.util.response :refer [response status]]
+   [ring.util.response :refer [response status redirect not-found]]
    [url-shortener.shared.sse-fragments :refer [sparkline]]))
 
 
@@ -129,4 +129,28 @@
          (for [r refs]
            [:div.referrer-row r])
          [:span.stat__muted "No data yet"])]))))
+
+
+(defn handle-link-detail [{{path :path} :path-params}]
+  (if-let [owner-id (redis/wcar nil (redis/hget path "owner-id"))]
+    (let [existing-token (redis/wcar nil (redis/srandmember (reports-key path)))
+          valid-token    (when existing-token
+                           (when (pos? (redis/wcar nil (redis/exists (report-key existing-token))))
+                             existing-token))]
+      (when (and existing-token (not valid-token))
+        (redis/wcar nil (redis/srem (reports-key path) existing-token)))
+      (if valid-token
+        (redirect (str "/report/" valid-token))
+        (let [token (generate-token)]
+          (redis/wcar nil
+            (redis/hset    (report-key token) "type"      "link"
+                                              "target-id" path
+                                              "owner-id"  owner-id
+                                              "created"   (epoch-now))
+            (redis/expire  (report-key token) TTL-REPORT)
+            (redis/sadd    (reports-key path) token))
+          (redirect (str "/report/" token)))))
+    (not-found "Link not found")))
+
+
 
