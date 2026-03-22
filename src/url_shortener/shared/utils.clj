@@ -30,5 +30,14 @@
 
 (defn today [] (str (LocalDate/now)))
 
+(defn this-week []
+  (let [date (java.time.LocalDate/now)]
+    (format "%d-W%02d"
+            (.get date java.time.temporal.IsoFields/WEEK_BASED_YEAR)
+            (.get date java.time.temporal.IsoFields/WEEK_OF_WEEK_BASED_YEAR))))
+
+(defn this-month [] (str (.getYear (java.time.LocalDate/now)) "-"
+                          (format "%02d" (.getMonthValue (java.time.LocalDate/now)))))
+
 (defn display-name [group-id]
   (last (clojure.string/split group-id #":")))

@@ -5,7 +5,7 @@
    [taoensso.carmine :as redis]
    [clojure.tools.logging :as log]
    [url-shortener.shared.utils :refer [generate-token epoch-now]]
-   [url-shortener.schema :refer [reports-key report-key ips-key referrers-key daily-key countries-key TTL-REPORT]]
+   [url-shortener.schema :refer [reports-key report-key ips-key referrers-key daily-key weekly-key monthly-key countries-key TTL-REPORT]]
    [ring.util.response :refer [response status redirect not-found]]
    [url-shortener.shared.sse-fragments :refer [sparkline]]))
 
@@ -94,14 +94,30 @@
         [:span.stat__label "Unique Visitors"]
         [:span.stat__value (or unique-ips 0)]]]))))
 
-(defn render-chart [path]
-  (let [daily (redis/wcar nil (redis/hgetall (daily-key path)))]
+(defn- render-chart [path]
+  (let [[daily weekly monthly]
+        (redis/wcar nil
+          (redis/hgetall (daily-key path))
+          (redis/hgetall (weekly-key path))
+          (redis/hgetall (monthly-key path)))]
     (str (h/html
-      [:div {:id "chart" :class "box stack"}
-       [:span.stat__label "Daily Clicks"]
-       (if (seq daily)
-         (sparkline (apply hash-map daily))
-         [:span.stat__muted "No data yet"])]))))
+      [:div {:id "chart" :class "stack"}
+       [:div.box.stack
+        [:span.stat__label "Daily"]
+        (if (seq daily)
+          (sparkline (apply hash-map daily))
+          [:span.stat__muted "No data yet"])]
+       [:div.box.stack
+        [:span.stat__label "Weekly"]
+        (if (seq weekly)
+          (sparkline (apply hash-map weekly))
+          [:span.stat__muted "No data yet"])]
+       [:div.box.stack
+        [:span.stat__label "Monthly"]
+        (if (seq monthly)
+          (sparkline (apply hash-map monthly))
+          [:span.stat__muted "No data yet"])]]))))
+
 
 (defn render-countries [path]
   (let [raw    (redis/wcar nil (redis/hgetall (countries-key path)))

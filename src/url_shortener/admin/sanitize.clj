@@ -1,5 +1,6 @@
 (ns url-shortener.admin.sanitize
-  (:require [taoensso.carmine :as redis]))
+  (:require [taoensso.carmine :as redis]
+            [url-shortener.schema :refer [default-group-id group-links-key]]))
 
 
 (defn populate-all-links! []
@@ -61,3 +62,20 @@
       (println "sampled 1000 legacy keys")
       (println "valid URLs:" (count non-nil))
       (println "sample URLs:" (take 3 non-nil)))))
+
+
+(defn migrate-groupless-link-hashes []
+  (let [hashes (redis/wcar nil (redis/smembers "all-links"))
+        migrated (atom 0)
+        skipped  (atom 0)]
+    (doseq [path hashes]
+      (let [group-id (redis/wcar nil (redis/hget path "group-id"))]
+        (if group-id
+          (swap! skipped inc)
+          (do
+            (redis/wcar nil
+                        (redis/hset path "group-id" (default-group-id "anonymous"))
+                        (redis/sadd (group-links-key (default-group-id "anonymous")) path)
+                        (redis/sadd "all-groups" (default-group-id "anonymous")))
+            (swap! migrated inc)))))
+    (println "migrated:" @migrated "skipped:" @skipped "total:" (count hashes))))

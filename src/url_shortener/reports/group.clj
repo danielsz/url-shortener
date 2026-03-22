@@ -7,7 +7,7 @@
    [clojure.tools.logging :as log]
    [ring.util.response :refer [response status]]
    
-   [url-shortener.schema :refer [report-key group-links-key group-daily-key group-countries-key group-key group-ips-key group-reports-key TTL-REPORT]]
+   [url-shortener.schema :refer [report-key group-links-key group-daily-key group-weekly-key group-monthly-key  group-countries-key group-key group-ips-key group-reports-key TTL-REPORT]]
    [url-shortener.shared.sse-fragments :refer [sparkline]]))
 
 (defn create-group-report! [owner-id group-id]
@@ -76,14 +76,29 @@
         [:span.stat__label "Unique Visitors"]
         [:span.stat__value (or unique-ips 0)]]]))))
 
-(defn render-chart [group-id]
-  (let [daily (redis/wcar nil (redis/hgetall (group-daily-key group-id)))]
+(defn- render-chart [group-id]
+  (let [[daily weekly monthly] (redis/wcar nil
+                                           (redis/hgetall (group-daily-key group-id))
+                                           (redis/hgetall (group-weekly-key group-id))
+                                           (redis/hgetall (group-monthly-key group-id)))]
     (str (h/html
-      [:div {:id "chart" :class "box stack"}
-       [:span.stat__label "Daily Clicks"]
-       (if (seq daily)
-         (sparkline (apply hash-map daily))
-         [:span.stat__muted "No data yet"])]))))
+      [:div {:id "chart" :class "stack"}
+       [:div.box.stack
+        [:span.stat__label "Daily"]
+        (if (seq daily)
+          (sparkline (apply hash-map daily))
+          [:span.stat__muted "No data yet"])]
+       [:div.box.stack
+        [:span.stat__label "Weekly"]
+        (if (seq weekly)
+          (sparkline (apply hash-map weekly))
+          [:span.stat__muted "No data yet"])]
+       [:div.box.stack
+        [:span.stat__label "Monthly"]
+        (if (seq monthly)
+          (sparkline (apply hash-map monthly))
+          [:span.stat__muted "No data yet"])]]))))
+
 
 (defn render-countries [group-id]
   (let [raw    (redis/wcar nil (redis/hgetall (group-countries-key group-id)))

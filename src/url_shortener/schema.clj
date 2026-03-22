@@ -7,6 +7,8 @@
 ;; <hash>:ips           zset    ip → last-seen epoch                            TTL-ANALYTICS
 ;; <hash>:referrers     list    referer strings                                 TTL-ANALYTICS
 ;; <hash>:daily         hash    "yyyy-MM-dd" → count                           TTL-ANALYTICS
+;; <hash>:weekly        hash    "yyyy-Www" → count     TTL-ANALYTICS
+;; <hash>:monthly       hash    "yyyy-MM" → count      TTL-ANALYTICS
 ;; <hash>:countries     hash    "ISO-code" → count                             TTL-ANALYTICS
 ;; <hash>:reports       set     report tokens                                   no TTL
 ;;
@@ -14,6 +16,8 @@
 ;; group:<group-id>             hash    owner-id, created                 no TTL
 ;; group:<group-id>:links       set     link hashes                             no TTL
 ;; group:<group-id>:daily       hash    "yyyy-MM-dd" → count                   TTL-ANALYTICS
+;; group:<id>:weekly    hash    "yyyy-Www" → count     TTL-ANALYTICS
+;; group:<id>:monthly   hash    "yyyy-MM" → count      TTL-ANALYTICS
 ;; group:<group-id>:countries   hash    "ISO-code" → count                     TTL-ANALYTICS
 ;; group:<group-id>:ips         zset    ip → last-seen epoch                   TTL-ANALYTICS
 ;; group:<group-id>:reports     set     report tokens                           no TTL
@@ -41,6 +45,8 @@
 (defn ips-key        [path] (str path ":ips"))
 (defn referrers-key  [path] (str path ":referrers"))
 (defn daily-key      [path] (str path ":daily"))
+(defn weekly-key        [path]     (str path ":weekly"))
+(defn monthly-key       [path]     (str path ":monthly"))
 (defn countries-key  [path] (str path ":countries"))
 (defn reports-key    [path] (str path ":reports"))
 
@@ -49,6 +55,8 @@
 (defn group-key          [group-id] (str "group:" group-id))
 (defn group-links-key    [group-id] (str "group:" group-id ":links"))
 (defn group-daily-key    [group-id] (str "group:" group-id ":daily"))
+(defn group-weekly-key  [group-id] (str "group:" group-id ":weekly"))
+(defn group-monthly-key [group-id] (str "group:" group-id ":monthly"))
 (defn group-countries-key [group-id] (str "group:" group-id ":countries"))
 (defn group-ips-key      [group-id] (str "group:" group-id ":ips"))
 (defn group-reports-key  [group-id] (str "group:" group-id ":reports"))
@@ -74,4 +82,5 @@
 ;; -- Default group ------------------------------------------------------------
 
 (defn default-group-id [owner-id] (str "default:" owner-id))
+
 

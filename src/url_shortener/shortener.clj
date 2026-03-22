@@ -2,7 +2,6 @@
   (:require [taoensso.carmine :as redis]
             [clojure.core.async :as a]
             [clojure.tools.logging :as log]
-            [url-shortener.analytics :refer [write-analytics!]]
             [url-shortener.shared.utils :refer [hash-url url-validator epoch-now]]
             [url-shortener.schema :refer [owner-key group-links-key default-group-id group-key owner-groups-key]]
             [ring.util.response :refer [response bad-request not-found redirect]]))
