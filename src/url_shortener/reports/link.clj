@@ -55,9 +55,7 @@
       (let [token (generate-token)]
         (redis/wcar nil
           (redis/hset    (report-key token)
-                         "type"      "link"
-                         "target-id" path
-                         "owner-id"  owner-id
+                         "subject" path
                          "created"   (epoch-now))
           (redis/expire  (report-key token) TTL-REPORT)
           (redis/sadd    (reports-key path) token))
@@ -66,7 +64,7 @@
 
 
 (defn handle-link-report [token report]
-  (let [path        (get report "target-id")
+  (let [path        (get report "subject")
         [url description]
         (redis/wcar nil
           (redis/hget path "url")
@@ -94,7 +92,7 @@
         [:span.stat__label "Unique Visitors"]
         [:span.stat__value (or unique-ips 0)]]]))))
 
-(defn- render-chart [path]
+(defn render-chart [path]
   (let [[daily weekly monthly]
         (redis/wcar nil
           (redis/hgetall (daily-key path))
@@ -159,10 +157,9 @@
         (redirect (str "/report/" valid-token))
         (let [token (generate-token)]
           (redis/wcar nil
-            (redis/hset    (report-key token) "type"      "link"
-                                              "target-id" path
-                                              "owner-id"  owner-id
-                                              "created"   (epoch-now))
+                      (redis/hset (report-key token)
+                                  "subject" path
+                                  "created"   (epoch-now))
             (redis/expire  (report-key token) TTL-REPORT)
             (redis/sadd    (reports-key path) token))
           (redirect (str "/report/" token)))))

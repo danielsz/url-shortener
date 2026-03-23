@@ -1,6 +1,7 @@
 (ns url-shortener.shared.utils
   (:require [taoensso.carmine :as redis]
-            [url-shortener.schema :refer [report-key]])
+            [url-shortener.schema :refer [report-key]]
+            [clojure.string :as str])
   (:import org.apache.commons.validator.routines.InetAddressValidator
            org.apache.commons.validator.routines.UrlValidator
            clojure.lang.Murmur3
@@ -40,4 +41,9 @@
                           (format "%02d" (.getMonthValue (java.time.LocalDate/now)))))
 
 (defn display-name [group-id]
-  (last (clojure.string/split group-id #":")))
+  (last (str/split group-id #":")))
+
+(defn infer-report-type [subject]
+  (if (str/includes? subject ":")
+    "group"
+    "link"))

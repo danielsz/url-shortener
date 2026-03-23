@@ -16,9 +16,7 @@
       (let [token (generate-token)]
         (redis/wcar nil
           (redis/hset    (report-key token)
-                         "type"      "group"
-                         "target-id" group-id
-                         "owner-id"  owner-id
+                         "subject" group-id
                          "created"   (epoch-now))
           (redis/expire  (report-key token) TTL-REPORT)
           (redis/sadd    (group-reports-key group-id) token))
@@ -53,7 +51,7 @@
        [:div {:id "links"}]]]]))
 
 (defn handle-group-report [token report]
-  (let [group-id   (get report "target-id")]
+  (let [group-id   (get report "subject")]
     {:status  200
      :headers {"Content-Type" "text/html"}
      :body    (group-report-page token group-id)}))
@@ -76,7 +74,7 @@
         [:span.stat__label "Unique Visitors"]
         [:span.stat__value (or unique-ips 0)]]]))))
 
-(defn- render-chart [group-id]
+(defn render-chart [group-id]
   (let [[daily weekly monthly] (redis/wcar nil
                                            (redis/hgetall (group-daily-key group-id))
                                            (redis/hgetall (group-weekly-key group-id))

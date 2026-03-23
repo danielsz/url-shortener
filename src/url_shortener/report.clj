@@ -27,7 +27,7 @@
 (defn handle-report-stream [pubsub {{token :token} :path-params :as request}]
   (if-let [report (resolve-report token)]
     (let [type      (get report "type")
-          target-id (get report "target-id")
+          subject (get report "subject")
           ch-atom   (atom nil)
           cleanup!  (fn []
                       (when-let [ch @ch-atom]
@@ -44,20 +44,20 @@
                              (case type
                                "link"
                                (do
-                                 (d*/patch-elements! sse (link/render-stats target-id))
-                                 (d*/patch-elements! sse (link/render-chart target-id))
-                                 (d*/patch-elements! sse (link/render-countries target-id))
-                                 (d*/patch-elements! sse (link/render-referrers target-id)))
+                                 (d*/patch-elements! sse (link/render-stats subject))
+                                 (d*/patch-elements! sse (link/render-chart subject))
+                                 (d*/patch-elements! sse (link/render-countries subject))
+                                 (d*/patch-elements! sse (link/render-referrers subject)))
                                "group"
                                (do
-                                 (d*/patch-elements! sse (group/render-stats target-id))
-                                 (d*/patch-elements! sse (group/render-chart target-id))
-                                 (d*/patch-elements! sse (group/render-countries target-id))
-                                 (d*/patch-elements! sse (group/render-links target-id)))))
+                                 (d*/patch-elements! sse (group/render-stats subject))
+                                 (d*/patch-elements! sse (group/render-chart subject))
+                                 (d*/patch-elements! sse (group/render-countries subject))
+                                 (d*/patch-elements! sse (group/render-links subject)))))
                  relevant? (fn [event]
                              (case type
-                               "link"  (= (:path event) target-id)
-                               "group" (= (:group-id event) target-id)))]
+                               "link"  (= (:path event) subject)
+                               "group" (= (:group-id event) subject)))]
              (async/sub (:publication pubsub) :click ch)
              (try               
                (push-all!)
@@ -74,8 +74,4 @@
            (log/debug "report stream on-close" token status)
            (cleanup!))}))
     (not-found "Report not found or expired")))
-
-
-
-
 

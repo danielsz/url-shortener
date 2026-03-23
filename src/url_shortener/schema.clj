@@ -30,7 +30,7 @@
 ;; apikey:<key>                 hash    owner-id, group-id, name, created, active   no TTL
 ;;
 ;; Reports
-;; report:<token>               hash    type, target-id, owner-id, created      TTL-REPORT
+;; report:<token>               hash    subject created                       TTL-REPORT
 ;;
 ;; Indexes
 ;; all-links                    set     all link hashes                         no TTL
