@@ -39,11 +39,11 @@
         (redis/expire  (group-weekly-key group-id) TTL-ANALYTICS)
         (redis/hincrby (group-monthly-key group-id) (this-month) 1)
         (redis/expire  (group-monthly-key group-id) TTL-ANALYTICS))      
-      (write-country geoip path group-id remote-addr))
-    (when referer
+      (write-country geoip path group-id remote-addr)
+      (when referer
       (redis/wcar nil
         (redis/lpush  (referrers-key path) referer)
-        (redis/expire (referrers-key path) TTL-ANALYTICS)))
+        (redis/expire (referrers-key path) TTL-ANALYTICS))))
     (catch Exception e
       (log/error e "analytics write failed" path))))
 

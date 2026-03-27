@@ -1,6 +1,6 @@
 (ns url-shortener.report
   (:require
-   [url-shortener.shared.utils :refer [resolve-report]]
+   [url-shortener.shared.utils :refer [resolve-report infer-report-type]]
    [clojure.tools.logging :as log]
    [ring.util.response :refer [bad-request not-found]]
    [starfederation.datastar.clojure.api :as d*]
@@ -17,17 +17,18 @@
 
 (defn handle-report-page [{{token :token} :path-params :as request}]
   (if-let [report (resolve-report token)]
-    (case (get report "type")
-      "link"  (link/handle-link-report token report)
-      "group" (group/handle-group-report token report)
-      (not-found "Unknown report type"))
+    (let [subject (get report "subject")]
+      (case (infer-report-type subject)
+        "link"  (link/handle-link-report  token report)
+        "group" (group/handle-group-report token report)
+        (not-found "Unknown report type")))
     (not-found "Report not found or expired")))
 
 
 (defn handle-report-stream [pubsub {{token :token} :path-params :as request}]
   (if-let [report (resolve-report token)]
-    (let [type      (get report "type")
-          subject (get report "subject")
+    (let [subject (get report "subject")
+          type      (infer-report-type subject)
           ch-atom   (atom nil)
           cleanup!  (fn []
                       (when-let [ch @ch-atom]

@@ -1,6 +1,6 @@
 (ns url-shortener.admin.sanitize
   (:require [taoensso.carmine :as redis]
-            [url-shortener.schema :refer [default-group-id group-links-key]]))
+            [url-shortener.schema :refer [default-group-id group-links-key referrers-key]]))
 
 
 (defn populate-all-links! []
@@ -79,3 +79,30 @@
                         (redis/sadd "all-groups" (default-group-id "anonymous")))
             (swap! migrated inc)))))
     (println "migrated:" @migrated "skipped:" @skipped "total:" (count hashes))))
+
+(defn migrate-report-key []
+  (let [report-keys (->> (redis/wcar nil (redis/keys "report:*"))
+                       (filter #(not (re-find #"[:].*[:]" %))))]
+  (doseq [rk report-keys]
+    (let [report (apply hash-map (redis/wcar nil (redis/hgetall rk)))]
+      (when (get report "target-id")
+        (redis/wcar nil
+          (redis/hset rk "subject" (get report "target-id"))
+          (redis/hdel rk "target-id")
+          (redis/hdel rk "type")
+          (redis/hdel rk "owner-id")))))
+  (println "migrated" (count report-keys) "report keys")))
+
+(defn referers []
+  (let [hashes  (redis/wcar nil (redis/smembers "all-links"))
+        refs    (->> hashes
+                   (mapcat (fn [path]
+                             (redis/wcar nil
+                                         (redis/lrange (referrers-key path) 0 -1))))
+                   (remove nil?)
+                   (remove empty?)
+                   distinct
+                   sort)]
+    (doseq [r refs]
+      (println r))
+    (println "\ntotal unique referrers:" (count refs))))
