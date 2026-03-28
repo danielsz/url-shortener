@@ -3,11 +3,11 @@
             [clojure.core.async :as a]
             [clojure.tools.logging :as log]
             [url-shortener.shared.utils :refer [hash-url url-validator epoch-now]]
-            [url-shortener.schema :refer [owner-key group-links-key default-group-id group-key owner-groups-key]]
+            [url-shortener.schema :refer [owner-key group-links-key default-group-id group-key owner-groups-key targets-key]]
             [ring.util.response :refer [response bad-request not-found redirect]]))
 
 
-(defn shorten [{{:keys [url owner-id group-id description]
+(defn shorten [{{:keys [url owner-id group-id description target]
                  :or   {owner-id "anonymous" description ""}} :params}]
   (if (.isValid url-validator url)
     (let [path     (hash-url url)
@@ -20,6 +20,8 @@
                            "group-id"    group-id
                            "description" description)
         (redis/hsetnx path "clicks" 0)
+        (when (seq target)
+          (redis/sadd (targets-key path) target))
         (redis/hsetnx (group-key group-id) "owner-id" owner-id)
         (redis/hsetnx (group-key group-id) "created"  (epoch-now))
         (redis/sadd   (owner-groups-key owner-id) group-id)

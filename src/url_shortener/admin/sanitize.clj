@@ -106,3 +106,16 @@
     (doseq [r refs]
       (println r))
     (println "\ntotal unique referrers:" (count refs))))
+
+(defn clean-up-self-referers []
+  (let [hashes (redis/wcar nil (redis/smembers "all-links"))
+      removed (atom 0)]
+  (doseq [h hashes]
+    (let [refs      (redis/wcar nil (redis/lrange (str h ":referrers") 0 -1))
+          self-refs (filter #(clojure.string/starts-with? % "https://tuppu.net/") refs)]
+      (when (seq self-refs)
+        (redis/wcar nil
+          (doseq [r self-refs]
+            (redis/lrem (str h ":referrers") 0 r)))
+        (swap! removed + (count self-refs)))))
+  (println "removed" @removed "self-referrer entries")))
