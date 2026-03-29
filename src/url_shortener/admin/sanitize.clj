@@ -1,5 +1,7 @@
 (ns url-shortener.admin.sanitize
   (:require [taoensso.carmine :as redis]
+            [clojure.string :as str]
+            [url-shortener.analytics :refer [referrer->platform]]
             [url-shortener.schema :refer [default-group-id group-links-key referrers-key]]))
 
 
@@ -119,3 +121,19 @@
             (redis/lrem (str h ":referrers") 0 r)))
         (swap! removed + (count self-refs)))))
   (println "removed" @removed "self-referrer entries")))
+
+
+(defn breakdown []
+  (let [hashes (redis/wcar nil (redis/smembers "all-links"))
+      all-refs (->> hashes
+                    (mapcat (fn [h]
+                              (redis/wcar nil
+                                (redis/lrange (str h ":referrers") 0 -1))))
+                    (remove nil?))
+      by-platform (->> all-refs
+                       (map referrer->platform)
+                       frequencies)
+      total (apply + (vals by-platform))]
+  (println (str "total referrers: " total))
+  (doseq [[p n] (->> by-platform (sort-by val >))]
+  (println (format "%-12s %4d  %.1f%%" p n (* 100.0 (/ n total)))))))
