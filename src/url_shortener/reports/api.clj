@@ -9,7 +9,7 @@
   (let [report (resolve-report token)]
     (if (seq report)
       (let [subject (get report "subject")
-            type      (infer-report-type subject)]
+            type (infer-report-type subject)]
         (case type
           "link"
           (let [[clicks url unique-ips daily weekly monthly referrers countries]

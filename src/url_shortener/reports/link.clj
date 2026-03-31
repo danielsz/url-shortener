@@ -4,7 +4,7 @@
    [hiccup.page :refer [html5]]
    [taoensso.carmine :as redis]
    [clojure.tools.logging :as log]
-   [url-shortener.shared.utils :refer [generate-token epoch-now]]
+   [url-shortener.shared.utils :refer [generate-token epoch-now find-or-create-report!]]
    [url-shortener.schema :refer [reports-key report-key ips-key referrers-key daily-key weekly-key monthly-key countries-key TTL-REPORT]]
    [ring.util.response :refer [response status redirect not-found]]
    [url-shortener.shared.sse-fragments :refer [sparkline]]))
@@ -48,20 +48,12 @@
        [:div {:id "referrers"}]]]]))
 
 
-
 (defn create-link-report! [owner-id path]
   (let [actual-owner (redis/wcar nil (redis/hget path "owner-id"))]
     (if (= actual-owner owner-id)
-      (let [token (generate-token)]
-        (redis/wcar nil
-          (redis/hset    (report-key token)
-                         "subject" path
-                         "created"   (epoch-now))
-          (redis/expire  (report-key token) TTL-REPORT)
-          (redis/sadd    (reports-key path) token))
-        (response (str (System/getProperty "shortener.service") "report/" token)))
+      (response (str (System/getProperty "shortener.service") "report/"
+                     (find-or-create-report! path reports-key)))
       (status 403))))
-
 
 (defn handle-link-report [token report]
   (let [path        (get report "subject")
@@ -146,24 +138,10 @@
 
 
 (defn handle-link-detail [{{path :path} :path-params}]
-  (if-let [owner-id (redis/wcar nil (redis/hget path "owner-id"))]
-    (let [existing-token (redis/wcar nil (redis/srandmember (reports-key path)))
-          valid-token    (when existing-token
-                           (when (pos? (redis/wcar nil (redis/exists (report-key existing-token))))
-                             existing-token))]
-      (when (and existing-token (not valid-token))
-        (redis/wcar nil (redis/srem (reports-key path) existing-token)))
-      (if valid-token
-        (redirect (str "/report/" valid-token))
-        (let [token (generate-token)]
-          (redis/wcar nil
-                      (redis/hset (report-key token)
-                                  "subject" path
-                                  "created"   (epoch-now))
-            (redis/expire  (report-key token) TTL-REPORT)
-            (redis/sadd    (reports-key path) token))
-          (redirect (str "/report/" token)))))
+  (if (redis/wcar nil (redis/hget path "owner-id"))
+    (redirect (str "/report/" (find-or-create-report! path reports-key)))
     (not-found "Link not found")))
+
 
 
 

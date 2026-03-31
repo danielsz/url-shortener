@@ -1,6 +1,6 @@
 (ns url-shortener.shared.utils
   (:require [taoensso.carmine :as redis]
-            [url-shortener.schema :refer [report-key]]
+            [url-shortener.schema :refer [report-key TTL-REPORT]]
             [clojure.string :as str])
   (:import org.apache.commons.validator.routines.InetAddressValidator
            org.apache.commons.validator.routines.UrlValidator
@@ -47,3 +47,18 @@
   (if (str/includes? subject ":")
     "group"
     "link"))
+
+(defn find-or-create-report! [subject reports-key-fn]
+  (let [existing-token (redis/wcar nil (redis/srandmember (reports-key-fn subject)))
+        valid-token    (when existing-token
+                         (when (pos? (redis/wcar nil (redis/exists (report-key existing-token))))
+                           existing-token))]
+    (when (and existing-token (not valid-token))
+      (redis/wcar nil (redis/srem (reports-key-fn subject) existing-token)))
+    (or valid-token
+        (let [token (generate-token)]
+          (redis/wcar nil
+            (redis/hset   (report-key token) "subject" subject "created" (epoch-now))
+            (redis/expire (report-key token) TTL-REPORT)
+            (redis/sadd   (reports-key-fn subject) token))
+          token))))

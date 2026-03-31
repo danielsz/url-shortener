@@ -3,25 +3,21 @@
    [hiccup2.core :as h]
    [hiccup.page :refer [html5]]
    [taoensso.carmine :as redis]
-   [url-shortener.shared.utils :refer [generate-token epoch-now display-name]]
+   [url-shortener.shared.utils :refer [generate-token epoch-now display-name find-or-create-report!]]
    [clojure.tools.logging :as log]
    [ring.util.response :refer [response status]]
    
    [url-shortener.schema :refer [report-key group-links-key group-daily-key group-weekly-key group-monthly-key  group-countries-key group-key group-ips-key group-reports-key TTL-REPORT]]
    [url-shortener.shared.sse-fragments :refer [sparkline]]))
 
+
 (defn create-group-report! [owner-id group-id]
   (let [actual-owner (redis/wcar nil (redis/hget (group-key group-id) "owner-id"))]
     (if (= actual-owner owner-id)
-      (let [token (generate-token)]
-        (redis/wcar nil
-          (redis/hset    (report-key token)
-                         "subject" group-id
-                         "created"   (epoch-now))
-          (redis/expire  (report-key token) TTL-REPORT)
-          (redis/sadd    (group-reports-key group-id) token))
-        (response (str (System/getProperty "shortener.service") "report/" token)))
+      (response (str (System/getProperty "shortener.service") "report/"
+                     (find-or-create-report! group-id group-reports-key)))
       (status 403))))
+
 
 (defn group-report-page [token group-id]
   (html5
