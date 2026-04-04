@@ -88,8 +88,8 @@
                                    :data-on:datastar-fetch "el === evt.detail.el && ((evt.detail.type.startsWith('datastar') && ($connected = true)) || (['retrying', 'error', 'finished'].includes(evt.detail.type) && ($connected = false)))"}
         [:div.cluster
          [:span.live-dot {:data-class "{active: $connected}"}]
-         [:span {:style "font-size: var(--step--1); color: var(--color-muted)"}
-          "Live"]]
+         [:span {:style "font-size: var(--step--1); color: var(--color-muted)"
+                 :data-text "$connected ? 'Live' : 'connecting…'"} "connecting..."]]
         [:div {:id "group-stats"}]
         [:div {:id "group-links"}]]]]]))
 
@@ -103,7 +103,7 @@
   (let [ch-atom  (atom nil)
         cleanup! (fn []
                    (when-let [ch @ch-atom]
-                     (async/unsub (:publication pubsub) :click ch)
+                     (async/unsub (:publication pubsub) :analytics-update ch)
                      (async/close! ch)
                      (reset! ch-atom nil)))]
     (->sse-response request
@@ -111,7 +111,7 @@
        (fn [sse]
          (let [ch (async/chan (async/sliding-buffer 10))]
            (reset! ch-atom ch)
-           (async/sub (:publication pubsub) :click ch)
+           (async/sub (:publication pubsub) :analytics-update ch)
            (try
              (d*/patch-elements! sse (render-group-stats group-id))
              (d*/patch-elements! sse (render-group-links group-id))

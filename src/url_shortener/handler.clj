@@ -6,6 +6,7 @@
    [url-shortener.reports.link :refer [handle-link-detail]]
    [url-shortener.admin.handler :refer [handle-admin handle-admin-stream]]
    [url-shortener.admin.group-detail :refer [handle-group-detail handle-group-stream]]
+   [url-shortener.admin.group-detail-v2 :refer [handle-group-detail-v2 handle-group-stream-v2]]
    [reitit.ring :as ring]
    [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
    [muuntaja.middleware :refer [wrap-params wrap-format]]
@@ -23,6 +24,8 @@
                 ["/admin/stream" {:get (partial handle-admin-stream pubsub)}]
                 ["/admin/group/:group-id"         {:get handle-group-detail}]
                 ["/admin/group/:group-id/stream"  {:get (partial handle-group-stream pubsub)}]
+                ["/admin/v2/group/:group-id"       {:get  handle-group-detail-v2}]
+                ["/admin/v2/group/:group-id/stream" {:get (partial handle-group-stream-v2 pubsub)}]
                 ["/admin/link/:path"             {:get  handle-link-detail}]]))
 
 (defn default-handler [component]

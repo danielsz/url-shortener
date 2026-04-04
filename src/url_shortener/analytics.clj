@@ -24,25 +24,34 @@
     (let [host (try (-> (java.net.URI. referer) .getHost (or ""))
                     (catch Exception _ ""))]
       (cond
-        (str/blank? host)                        "direct"
-        (re-find #"(^|\.)twitter\.com$" host)   "twitter"
-        (= host "t.co")                          "twitter"
-        (re-find #"(^|\.)xstalk\.com$" host)    "twitter"
-        (re-find #"(^|\.)sotwe\.com$" host)     "twitter"
-        (str/starts-with? host "nitter.")        "twitter"
-        (= host "go.bsky.app")                  "bluesky"
-        (re-find #"(^|\.)bsky\.app$" host)      "bluesky"
-        (re-find #"(^|\.)bluesky\." host)       "bluesky"
-        (re-find #"(^|\.)facebook\.com$" host)  "facebook"
-        (re-find #"(^|\.)fb\.com$" host)        "facebook"
-        (re-find #"(^|\.)instagram\.com$" host) "instagram"
-        (re-find #"(^|\.)linkedin\.com$" host)  "linkedin"
-        (re-find #"(^|\.)pinterest\." host)     "pinterest"
-        (re-find #"(^|\.)google\." host)        "google"
-        :else                                    "other"))
+        (str/blank? host)                          "direct"
+        ;; Twitter — genuine direct clicks
+        (re-find #"(^|\.)twitter\.com$" host)     "twitter"
+        (= host "t.co")                            "twitter"
+        ;; Twitter — aggregators/alternative browsers (human but indirect)
+        (re-find #"(^|\.)xstalk\.com$" host)      "twitter-aggregator"
+        (re-find #"(^|\.)sotwe\.com$" host)       "twitter-aggregator"
+        (str/starts-with? host "nitter.")          "twitter-aggregator"
+        (= host "cayote.openmtx.com")             "twitter-aggregator"
+        ;; Bluesky — direct and explorers
+        (= host "go.bsky.app")                    "bluesky"
+        (re-find #"(^|\.)bsky\.app$" host)        "bluesky"
+        (re-find #"(^|\.)bluesky\." host)         "bluesky"
+        (= host "tuztoz.com")                     "bluesky"
+        (re-find #"(^|\.)lightnews\.app$" host)   "bluesky"
+        ;; Mastodon / ActivityPub
+        (= host "taboo.cafe")                     "mastodon"
+        ;; Other social
+        (re-find #"(^|\.)facebook\.com$" host)    "facebook"
+        (re-find #"(^|\.)fb\.com$" host)          "facebook"
+        (re-find #"(^|\.)instagram\.com$" host)   "instagram"
+        (re-find #"(^|\.)linkedin\.com$" host)    "linkedin"
+        (re-find #"(^|\.)pinterest\." host)       "pinterest"
+        (re-find #"(^|\.)google\." host)          "google"
+        :else                                      "other"))
     "direct"))
 
-(defn write-analytics! [geoip path group-id remote-addr referer]
+(defn write-analytics! [pubsub geoip {:keys [path group-id remote-addr referer]}]
   (log/debug path remote-addr referer)
   (try
     (when (.isValid ip-validator remote-addr)
@@ -70,6 +79,7 @@
                     (redis/hincrby (group-platforms-key group-id) platform 1)
                     (redis/expire  (group-platforms-key group-id) TTL-ANALYTICS))
         (write-country geoip path group-id remote-addr)
+        (a/thread (a/>!! (:channel pubsub) {:topic :analytics-update :path path :remote-addr remote-addr :group-id group-id :referer referer}))
         (when referer
           (redis/wcar nil
                       (redis/lpush  (referrers-key path) referer)
@@ -85,8 +95,8 @@
       (sub (:publication pubsub) :click ch)
       (thread
         (loop []
-          (when-let [{:keys [path group-id remote-addr referer]} (<!! ch)]
-            (write-analytics! geoip path group-id remote-addr referer)
+          (when-let [event (<!! ch)]
+            (write-analytics! pubsub geoip event) ;; pubsub because we are going to publish an event (other topic)
             (recur))))
       (assoc component :ch ch)))
   (stop [{:keys [pubsub ch] :as component}]

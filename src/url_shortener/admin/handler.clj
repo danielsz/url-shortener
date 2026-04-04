@@ -34,8 +34,8 @@
                                    :data-on:datastar-fetch "el === evt.detail.el && ((evt.detail.type.startsWith('datastar') && ($connected = true)) || (['retrying', 'error', 'finished'].includes(evt.detail.type) && ($connected = false)))"}
         [:div.cluster
          [:span.live-dot {:data-class "{active: $connected}"}]
-         [:span {:style "font-size: var(--step--1); color: var(--color-muted)"}
-          "Live"]]
+         [:span {:style "font-size: var(--step--1); color: var(--color-muted)"
+                 :data-text "$connected ? 'Live' : 'connecting…'"} "connecting..."]]
         [:div.switcher {:id "stats"}
          [:div.box.stack
           [:span.stat__label "Total Links"]
@@ -58,7 +58,7 @@
         cleanup! (fn []
                    (when-let [ch @ch-atom]
                      (log/debug "admin stream closed")
-                     (unsub (:publication pubsub) :click ch)
+                     (unsub (:publication pubsub) :analytics-update ch)
                      (close! ch)
                      (reset! ch-atom nil)))]
     (hk-gen/->sse-response request
@@ -66,7 +66,7 @@
        (fn [sse]
          (let [ch (chan (sliding-buffer 10))]
            (reset! ch-atom ch)
-           (sub (:publication pubsub) :click ch)
+           (sub (:publication pubsub) :analytics-update ch)
            (try
              (d*/patch-elements! sse (render/render-stats))
              (d*/patch-elements! sse (render/render-groups))

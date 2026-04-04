@@ -33,7 +33,7 @@
           cleanup!  (fn []
                       (when-let [ch @ch-atom]
                         (log/debug "report stream closed" token)
-                        (async/unsub (:publication pubsub) :click ch)
+                        (async/unsub (:publication pubsub) :analytics-update ch)
                         (async/close! ch)
                         (reset! ch-atom nil)))]
       (->sse-response request
@@ -59,7 +59,7 @@
                              (case type
                                "link"  (= (:path event) subject)
                                "group" (= (:group-id event) subject)))]
-             (async/sub (:publication pubsub) :click ch)
+             (async/sub (:publication pubsub) :analytics-update ch)
              (try               
                (push-all!)
                (loop []
