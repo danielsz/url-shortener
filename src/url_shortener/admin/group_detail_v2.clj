@@ -51,12 +51,26 @@
 
         [:div.dashboard-grid
 
-         [:div.col-chart
+         [:div.col-main
 
-          [:div.pnl.stack
-           [:div.pnl-title "Clicks over time — daily"]
-           [:div.chart-wrap
-            [:canvas {:id "tsChart"}]]]]
+          
+          [:div.col-chart
+
+           [:div.pnl.stack
+            [:div.pnl-title "Clicks over time — daily"]
+            [:div.chart-wrap
+             [:canvas {:id "tsChart"}]]]]
+
+          [:div.pnl.stack.pnl--conditional
+           {:id        "feed-pnl"
+            :data-show "$feed && $feed.length > 0"}
+           [:div.pnl-title "Recent clicks"]
+           [:div.panel-body {:id "feed-panel"}]]
+
+          [:div.col-links
+           [:div.pnl.stack
+            [:div.pnl-title "Links by volume"]
+            [:div.panel-body {:id "links-panel"}]]]]
 
          [:div.col-side
 
@@ -80,25 +94,14 @@
           [:div.pnl.stack
            [:div.pnl-title "Sources"]
            [:div.panel-body {:id "platforms-panel"}]
-           [:p.note "No pie — angle encodes Q data poorly."]]
-
-          [:div.pnl.stack.pnl--conditional
-           {:id        "feed-pnl"
-            :data-show "$feed && $feed.length > 0"}
-           [:div.pnl-title "Recent clicks"]
-           [:div.panel-body {:id "feed-panel"}]]
+           [:p.note "No pie — angle encodes Q data poorly."]]          
 
           [:div.pnl.stack.pnl--confirmed.pnl--conditional
            {:id        "confirmed-pnl"
             :data-show "$confirmed && Object.keys($confirmed).length > 0"}
            [:div.pnl-title "Platform confirmation"]
            [:span.enc-tag "Observed platform ∈ intended targets"]
-           [:div.panel-body {:id "confirmed-panel"}]]]
-
-         [:div.col-links
-           [:div.pnl.stack
-            [:div.pnl-title "Links by volume"]
-            [:div.panel-body {:id "links-panel"}]]]]]
+           [:div.panel-body {:id "confirmed-panel"}]]]]]
        [:div.back-link
            [:a {:href "/admin"} "← Admin Dashboard"]]]]
      [:script {:src "/js/group-dashboard.js"}]]))

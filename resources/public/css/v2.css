@@ -123,6 +123,7 @@ a {
   max-inline-size: var(--measure, 80rem);
   margin-inline: auto;
   padding-inline: var(--space-s-l);
+  padding-block-start: var(--space-s-l);
 }
 
 /* ---------------------------------------------------------------------------
@@ -192,11 +193,16 @@ a {
   align-items: start;
 }
 
-.col-chart {
+.col-main {
   flex-basis: 0;
   flex-grow: 999;
-  min-inline-size: min(55%, 100%);
+  min-inline-size: min(60%, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
 }
+
+
 .col-side {
   flex-basis: 240px;
   flex-grow: 1;
@@ -205,9 +211,7 @@ a {
   gap: var(--space-s);
 }
 
-.col-links {
-  flex-basis: 100%;
-}
+
 
 /* ---------------------------------------------------------------------------
    Header
