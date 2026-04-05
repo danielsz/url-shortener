@@ -62,6 +62,8 @@
   /* Platform hues — nominal encoding only, never Q data */
   --c-direct:    #7a7970;
   --c-twitter:   #378ADD;
+  --c-twitter-aggregator: #5B9BD5;
+  --c-mastodon:  #6364FF;
   --c-bluesky:   #0085FF;
   --c-facebook:  #1D9E75;
   --c-instagram: #D85A30;
@@ -69,6 +71,8 @@
   --c-pinterest: #9B4F96;
   --c-google:    #E8A020;
   --c-other:     #888780;
+/* live dot */
+  --c-signal: #378ADD;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -253,7 +257,7 @@ a {
 
 /* Confirmed panel accent border */
 .pnl--confirmed {
-  border-color: var(--c-twitter);
+  border-color: var(--border-s);
 }
 
 /* Panel body — flex column container for dynamic content */
@@ -325,7 +329,7 @@ a {
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: var(--c-twitter);
+  background: var(--c-signal);
   display: inline-block;
   animation: pulse 1.8s ease-in-out infinite;
   vertical-align: middle;
@@ -370,13 +374,6 @@ a {
   position: relative;
   block-size: clamp(140px, 20vw, 200px);
   overflow: hidden;
-}
-
-.chart-wrap canvas {
-  position: absolute;
-  inset: 0;
-  width: 100% !important;
-  height: 100% !important;
 }
 
 #legend {
@@ -547,7 +544,7 @@ a {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  margin-block-start: 2px;
+  margin-block-start: var(--space-3xs);
 }
 
 /* ---------------------------------------------------------------------------
