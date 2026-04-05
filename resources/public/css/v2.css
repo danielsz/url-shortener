@@ -71,7 +71,7 @@
   --c-pinterest: #9B4F96;
   --c-google:    #E8A020;
   --c-other:     #888780;
-/* live dot */
+  /* live dot */
   --c-signal: #378ADD;
 }
 
@@ -119,7 +119,7 @@ a {
    --------------------------------------------------------------------------- */
 
 .center {
- box-sizing: content-box;
+  box-sizing: content-box;
   max-inline-size: var(--measure, 80rem);
   margin-inline: auto;
   padding-inline: var(--space-s-l);
@@ -192,21 +192,21 @@ a {
   align-items: start;
 }
 
-.col-main {
+.col-chart {
   flex-basis: 0;
   flex-grow: 999;
-  min-inline-size: min(60%, 100%);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-s);
+  min-inline-size: min(55%, 100%);
 }
-
 .col-side {
   flex-basis: 240px;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
   gap: var(--space-s);
+}
+
+.col-links {
+  flex-basis: 100%;
 }
 
 /* ---------------------------------------------------------------------------

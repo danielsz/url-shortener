@@ -51,16 +51,12 @@
 
         [:div.dashboard-grid
 
-         [:div.col-main
+         [:div.col-chart
 
           [:div.pnl.stack
            [:div.pnl-title "Clicks over time — daily"]
            [:div.chart-wrap
-            [:canvas {:id "tsChart"}]]]
-
-          [:div.pnl.stack
-           [:div.pnl-title "Links by volume"]
-           [:div.panel-body {:id "links-panel"}]]]
+            [:canvas {:id "tsChart"}]]]]
 
          [:div.col-side
 
@@ -97,11 +93,14 @@
             :data-show "$confirmed && Object.keys($confirmed).length > 0"}
            [:div.pnl-title "Platform confirmation"]
            [:span.enc-tag "Observed platform ∈ intended targets"]
-           [:div.panel-body {:id "confirmed-panel"}]]
+           [:div.panel-body {:id "confirmed-panel"}]]]
 
-          [:div.back-link
-           [:a {:href "/admin"} "← Admin Dashboard"]]]]]]]
-
+         [:div.col-links
+           [:div.pnl.stack
+            [:div.pnl-title "Links by volume"]
+            [:div.panel-body {:id "links-panel"}]]]]]
+       [:div.back-link
+           [:a {:href "/admin"} "← Admin Dashboard"]]]]
      [:script {:src "/js/group-dashboard.js"}]]))
 
 (defn handle-group-detail-v2 [{{group-id :group-id} :path-params}]
