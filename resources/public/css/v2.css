@@ -189,6 +189,7 @@ a {
 .dashboard-grid {
   display: flex;
   flex-wrap: wrap;
+  flex-direction: row-reverse;
   gap: var(--space-s);
   align-items: start;
 }
