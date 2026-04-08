@@ -26,6 +26,8 @@
       (cond
         (str/blank? host)                          "direct"
         ;; Twitter — genuine direct clicks
+        (re-find #"(^|\.)reddit\.com$" host)        "reddit"
+        (= host "com.reddit.frontpage")             "reddit"
         (re-find #"(^|\.)twitter\.com$" host)     "twitter"
         (= host "t.co")                            "twitter"
         ;; Twitter — aggregators/alternative browsers (human but indirect)
@@ -46,6 +48,7 @@
         (re-find #"(^|\.)fb\.com$" host)          "facebook"
         (re-find #"(^|\.)instagram\.com$" host)   "instagram"
         (re-find #"(^|\.)linkedin\.com$" host)    "linkedin"
+        (= host "com.linkedin.android")             "linkedin"
         (re-find #"(^|\.)pinterest\." host)       "pinterest"
         (re-find #"(^|\.)google\." host)          "google"
         :else                                      "other"))
