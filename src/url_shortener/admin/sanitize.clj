@@ -2,7 +2,7 @@
   (:require [taoensso.carmine :as redis]
             [clojure.string :as str]
             [url-shortener.analytics :refer [referrer->platform]]
-            [url-shortener.schema :refer [default-group-id group-links-key referrers-key]]))
+            [url-shortener.schema :refer [default-group-id group-links-key referrers-key platforms-key]]))
 
 
 (defn populate-all-links! []
