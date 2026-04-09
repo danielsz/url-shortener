@@ -585,3 +585,15 @@ a {
 .back-link a:hover {
   color: var(--text-s);
 }
+
+
+.link-url {
+  font-size: var(--step--2);
+  word-break: break-all;
+  overflow-wrap: anywhere;
+}
+
+.link-desc {
+  font-size: var(--step--2);
+  color: var(--text-s);
+}
