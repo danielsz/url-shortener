@@ -26,14 +26,14 @@
       (cond
         (str/blank? host)                          "direct"
         ;; Twitter — genuine direct clicks
-        (re-find #"(^|\.)reddit\.com$" host)        "reddit"
-        (= host "com.reddit.frontpage")             "reddit"
+        (re-find #"(^|\.)reddit\.com$" host)       "reddit"
+        (= host "com.reddit.frontpage")           "reddit"
         (re-find #"(^|\.)twitter\.com$" host)     "twitter"
-        (= host "t.co")                            "twitter"
+        (= host "t.co")                           "twitter"
         ;; Twitter — aggregators/alternative browsers (human but indirect)
         (re-find #"(^|\.)xstalk\.com$" host)      "twitter-aggregator"
         (re-find #"(^|\.)sotwe\.com$" host)       "twitter-aggregator"
-        (str/starts-with? host "nitter.")          "twitter-aggregator"
+        (str/starts-with? host "nitter.")         "twitter-aggregator"
         (= host "cayote.openmtx.com")             "twitter-aggregator"
         ;; Bluesky — direct and explorers
         (= host "go.bsky.app")                    "bluesky"
@@ -43,6 +43,7 @@
         (re-find #"(^|\.)lightnews\.app$" host)   "bluesky"
         ;; Mastodon / ActivityPub
         (= host "taboo.cafe")                     "mastodon"
+        (= host "mastodon.social")                "mastodon"
         ;; Other social
         (re-find #"(^|\.)facebook\.com$" host)    "facebook"
         (re-find #"(^|\.)fb\.com$" host)          "facebook"

@@ -9,7 +9,9 @@
     [url-shortener.shared.utils :refer [display-name]]
     [url-shortener.autotweet.shop-detail :as autotweet]
     [taoensso.carmine :as redis]
-    [cheshire.core :as json]))
+    [cheshire.core :as json]
+    [ring.util.response :refer [redirect]]
+    [url-shortener.schema :refer [group-links-key]]))
 
 (defn- build-signals [group-id]
   (let [{:keys [platforms confirmed]} (analytics/group-platforms group-id)]
@@ -114,6 +116,16 @@
    :headers {"Content-Type" "text/html"
              "Cache-Control" "no-store"}
    :body    (group-detail-page-v2 group-id)})
+
+
+(defn handle-group-detail-v2 [{{group-id :group-id} :path-params}]
+  (let [links (redis/wcar nil (redis/smembers (group-links-key group-id)))]
+    (if (= 1 (count links))
+      (redirect (str "/admin/v2/link/" (first links)))
+      {:status  200
+       :headers {"Content-Type" "text/html"
+                 "Cache-Control" "no-store"}
+       :body    (group-detail-page-v2 group-id)})))
 
 
 (defn handle-group-stream-v2 [pubsub {{group-id :group-id} :path-params :as request}]

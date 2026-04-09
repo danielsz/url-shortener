@@ -89,13 +89,14 @@
 
 (defn group-platforms [group-id]
   (let [platforms (hgetall->map (group-platforms-key group-id))
+        ;; aggregate targets across all links — one pipeline call
         paths     (redis/wcar nil (redis/smembers (group-links-key group-id)))
         targets   (when (seq paths)
-                    (let [raw (redis/wcar nil
-                                (doseq [p paths]
-                                  (redis/smembers (targets-key p))))
-                          raw (if (= 1 (count paths)) [raw] raw)]
-                      (->> raw (apply concat) set)))]
+                    (->> (redis/wcar nil
+                           (doseq [p paths]
+                             (redis/smembers (targets-key p))))
+                         (apply concat)
+                         set))]
     {:platforms platforms
      :confirmed (when (seq targets)
                   (select-keys platforms targets))}))
