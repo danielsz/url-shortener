@@ -151,7 +151,8 @@
                      (let [path (:path event)
                            url  (redis/wcar nil (redis/hget path "url"))
                            item {:short (str (System/getProperty "shortener.service") path)
-                                 :url   url}]
+                                 :url   url
+                                 :time  (-> (java.time.LocalTime/now) (.truncatedTo java.time.temporal.ChronoUnit/SECONDS) str)}]
                        (swap! feed-atom #(vec (take 5 (cons item %)))))
                      (d*/patch-signals! sse (json/generate-string (assoc (build-signals group-id) :feed @feed-atom)))
                      (catch Exception e (log/error "push failed" (.getMessage e)))))

@@ -129,9 +129,10 @@
              (loop []
                (when-let [event (async/<!! ch)]
                  (when (= (:path event) path)
-                   (try
+                    (try
                      (let [item {:short (str (System/getProperty "shortener.service") path)
-                                 :url   (redis/wcar nil (redis/hget path "url"))}]
+                                 :url   (redis/wcar nil (redis/hget path "url"))
+                                 :time  (-> (java.time.LocalTime/now) (.truncatedTo java.time.temporal.ChronoUnit/SECONDS) str)}]
                        (swap! feed-atom #(vec (take 5 (cons item %)))))
                      (d*/patch-signals! sse (json/generate-string (assoc (build-signals path) :feed @feed-atom)))
                      (catch Exception e (log/error "push failed" (.getMessage e)))))
