@@ -25,9 +25,9 @@
      [:meta {:charset "utf-8"}]
      [:meta {:name "viewport" :content "width=device-width, initial-scale=1"}]
      [:title (str (display-name group-id) " — Analytics")]
-     [:link {:rel "stylesheet" :href "/css/tokens.css"}]
-     [:link {:rel "stylesheet" :href "/css/layout.css"}]
-     [:link {:rel "stylesheet" :href "/css/report.css"}]
+     [:link {:rel "stylesheet" :href "/css/v1/tokens.css"}]
+     [:link {:rel "stylesheet" :href "/css/v1/layout.css"}]
+     [:link {:rel "stylesheet" :href "/css/v1/report.css"}]
      [:script {:type "module"
                :src  "https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.8/bundles/datastar.js"}]]
     [:body

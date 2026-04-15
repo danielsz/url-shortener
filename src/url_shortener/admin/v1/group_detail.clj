@@ -1,4 +1,4 @@
-(ns url-shortener.admin.group-detail
+(ns url-shortener.admin.v1.group-detail
   (:require
     [hiccup2.core :as h]
     [hiccup.page :refer [html5]]
@@ -52,7 +52,7 @@
        (if (seq links)
          (for [{:keys [path url desc clicks]} links]
            [:a.box.stack
-            {:href  (str "/admin/link/" path)
+            {:href  (str "/admin/v1/link/" path)
              :style "--stack-space: var(--space-s)"}
             [:div.cluster
              [:span.link-card__clicks clicks]
@@ -68,10 +68,10 @@
      [:meta {:charset "utf-8"}]
      [:meta {:name "viewport" :content "width=device-width, initial-scale=1"}]
      [:title (str (display-name group-id) " — Links")]
-     [:link {:rel "stylesheet" :href "/css/tokens.css"}]
-     [:link {:rel "stylesheet" :href "/css/layout.css"}]
-     [:link {:rel "stylesheet" :href "/css/admin.css"}]
-     [:link {:rel "stylesheet" :href "/css/report.css"}]
+     [:link {:rel "stylesheet" :href "/css/v1/tokens.css"}]
+     [:link {:rel "stylesheet" :href "/css/v1/layout.css"}]
+     [:link {:rel "stylesheet" :href "/css/v1/admin.css"}]
+     [:link {:rel "stylesheet" :href "/css/v1/report.css"}]
      [:script {:type "module"
                :src  "https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.8/bundles/datastar.js"}]
      [:script "window.addEventListener('pageshow', function(event) { if (event.persisted) { window.location.reload(); } });"]]
@@ -83,7 +83,7 @@
         [:div.nav__title (display-name group-id)]
         [:a.nav__link {:href "#group-stats"}  "Overview"]
         [:a.nav__link {:href "#group-links"}  "Links"]]
-       [:main.sidebar__main.stack {:data-init           (str "@get('/admin/group/" group-id "/stream')")
+       [:main.sidebar__main.stack {:data-init           (str "@get('/admin/v1/group/" group-id "/stream')")
                                    :data-signals        "{connected: false}"
                                    :data-on:datastar-fetch "el === evt.detail.el && ((evt.detail.type.startsWith('datastar') && ($connected = true)) || (['retrying', 'error', 'finished'].includes(evt.detail.type) && ($connected = false)))"}
         [:div.cluster

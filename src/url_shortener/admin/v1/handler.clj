@@ -1,4 +1,4 @@
-(ns url-shortener.admin.handler
+(ns url-shortener.admin.v1.handler
   (:require
     [hiccup2.core :as h]
     [clojure.core.async :as a :refer [chan sliding-buffer <!! sub unsub close!]]
@@ -6,7 +6,7 @@
     [clojure.tools.logging :as log]
     [starfederation.datastar.clojure.api :as d*]
     [starfederation.datastar.clojure.adapter.http-kit :as hk-gen]
-    [url-shortener.admin.render :as render]))
+    [url-shortener.admin.v1.render :as render]))
 
 (defn- admin-page []
   (html5
@@ -14,10 +14,10 @@
      [:meta {:charset "utf-8"}]
      [:meta {:name "viewport" :content "width=device-width, initial-scale=1"}]
      [:title "Admin Dashboard"]
-     [:link {:rel "stylesheet" :href "/css/tokens.css"}]
-     [:link {:rel "stylesheet" :href "/css/layout.css"}]
-     [:link {:rel "stylesheet" :href "/css/report.css"}]
-     [:link {:rel "stylesheet" :href "/css/admin.css"}]
+     [:link {:rel "stylesheet" :href "/css/v1/tokens.css"}]
+     [:link {:rel "stylesheet" :href "/css/v1/layout.css"}]
+     [:link {:rel "stylesheet" :href "/css/v1/report.css"}]
+     [:link {:rel "stylesheet" :href "/css/v1/admin.css"}]
      [:script {:type "module"
                :src  "https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.8/bundles/datastar.js"}]
      [:script "window.addEventListener('pageshow', function(event) { if (event.persisted) { window.location.reload(); } });"]]
@@ -29,7 +29,7 @@
         [:a.nav__link {:href "#stats"}     "Overview"]
         [:a.nav__link {:href "#groups"}     "Groups"]
         [:a.nav__link {:href "#countries"} "Countries"]]
-       [:main.sidebar__main.stack {:data-init           "@get('/admin/stream')"
+       [:main.sidebar__main.stack {:data-init           "@get('/admin/v1/stream')"
                                    :data-signals        "{connected: false}"
                                    :data-on:datastar-fetch "el === evt.detail.el && ((evt.detail.type.startsWith('datastar') && ($connected = true)) || (['retrying', 'error', 'finished'].includes(evt.detail.type) && ($connected = false)))"}
         [:div.cluster

@@ -1,4 +1,4 @@
-(ns url-shortener.admin.render
+(ns url-shortener.admin.v1.render
   (:require
     [hiccup2.core :as h]
     [taoensso.carmine :as redis]
@@ -58,9 +58,9 @@
        (if (seq groups)
          (for [{:keys [group-id clicks unique-ips link-count]} groups]
            [:a.group-card.box.stack
-            {:href                    (str "/admin/group/" group-id)
+            {:href                    (str "/admin/v1/group/" group-id)
              :style                   "--stack-space: var(--space-s)"
-             :data-on:click           (str "@get('/admin/group/" group-id "')")}
+             :data-on:click           (str "@get('/admin/v1/group/" group-id "')")}
             [:div.cluster
              [:span.group-card__name (display-name group-id)]
              [:span.stat__label (str link-count " links")]]

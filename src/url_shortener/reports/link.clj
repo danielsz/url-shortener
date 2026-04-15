@@ -3,9 +3,8 @@
    [hiccup2.core :as h]
    [hiccup.page :refer [html5]]
    [taoensso.carmine :as redis]
-   [clojure.tools.logging :as log]
-   [url-shortener.shared.utils :refer [generate-token epoch-now find-or-create-report!]]
-   [url-shortener.schema :refer [reports-key report-key ips-key referrers-key daily-key weekly-key monthly-key countries-key TTL-REPORT]]
+   [url-shortener.shared.utils :refer [find-or-create-report!]]
+   [url-shortener.schema :refer [reports-key ips-key referrers-key daily-key weekly-key monthly-key countries-key TTL-REPORT]]
    [ring.util.response :refer [response status redirect not-found]]
    [url-shortener.shared.sse-fragments :refer [sparkline]]))
 
@@ -137,10 +136,6 @@
          [:span.stat__muted "No data yet"])]))))
 
 
-(defn handle-link-detail [{{path :path} :path-params}]
-  (if (redis/wcar nil (redis/hget path "owner-id"))
-    (redirect (str "/report/" (find-or-create-report! path reports-key)))
-    (not-found "Link not found")))
 
 
 

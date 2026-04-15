@@ -1,4 +1,4 @@
-(ns url-shortener.admin.link-detail-v2
+(ns url-shortener.admin.v2.link-detail
   (:require
     [hiccup.page :refer [html5]]
     [clojure.core.async :as async]
@@ -19,7 +19,7 @@
              :feed      []}
       (seq confirmed) (assoc :confirmed confirmed))))
 
-(defn- link-detail-page-v2 [path]
+(defn- link-detail-page [path]
   (let [[url desc] (redis/wcar nil
                      (redis/hget path "url")
                      (redis/hget path "description"))]
@@ -28,7 +28,7 @@
        [:meta {:charset "utf-8"}]
        [:meta {:name "viewport" :content "width=device-width, initial-scale=1"}]
        [:title (str (or desc url) " — Analytics")]
-       [:link {:rel "stylesheet" :href "/css/v2.css"}]
+       [:link {:rel "stylesheet" :href "/css/v2/v2.css"}]
        [:script {:src "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"}]
        [:script {:type "module"
                  :src  "https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.8/bundles/datastar.js"}]]
@@ -104,13 +104,13 @@
           [:a {:href "/admin"} "← Admin Dashboard"]]]]
         [:script {:src "/js/group-dashboard.js"}]]])))
 
-(defn handle-link-detail-v2 [{{path :path} :path-params}]
+(defn handle-link-detail [{{path :path} :path-params}]
   {:status  200
    :headers {"Content-Type" "text/html"
              "Cache-Control" "no-store"}
-   :body    (link-detail-page-v2 path)})
+   :body    (link-detail-page path)})
 
-(defn handle-link-stream-v2 [pubsub {{path :path} :path-params :as request}]
+(defn handle-link-stream [pubsub {{path :path} :path-params :as request}]
   (let [ch-atom   (atom nil)
         feed-atom (atom [])
         cleanup!  (fn []

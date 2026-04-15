@@ -1,4 +1,4 @@
-(ns url-shortener.admin.group-detail-v2
+(ns url-shortener.admin.v2.group-detail
   (:require
     [hiccup.page :refer [html5]]
     [clojure.core.async :as async]
@@ -24,13 +24,13 @@
       (seq confirmed) (assoc :confirmed confirmed))))
 
 
-(defn- group-detail-page-v2 [group-id]
+(defn- group-detail-page [group-id]
   (html5
     [:head
      [:meta {:charset "utf-8"}]
      [:meta {:name "viewport" :content "width=device-width, initial-scale=1"}]
      [:title (str (display-name group-id) " — Analytics")]
-     [:link {:rel "stylesheet" :href "/css/v2.css"}]
+     [:link {:rel "stylesheet" :href "/css/v2/v2.css"}]
      [:script {:src "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"}]
      [:script {:type "module"
                :src  "https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.8/bundles/datastar.js"}]]
@@ -111,24 +111,18 @@
            [:a {:href "/admin"} "← Admin Dashboard"]]]]
      [:script {:src "/js/group-dashboard.js"}]]))
 
-(defn handle-group-detail-v2 [{{group-id :group-id} :path-params}]
-  {:status  200
-   :headers {"Content-Type" "text/html"
-             "Cache-Control" "no-store"}
-   :body    (group-detail-page-v2 group-id)})
 
-
-(defn handle-group-detail-v2 [{{group-id :group-id} :path-params}]
+(defn handle-group-detail [{{group-id :group-id} :path-params}]
   (let [links (redis/wcar nil (redis/smembers (group-links-key group-id)))]
     (if (= 1 (count links))
       (redirect (str "/admin/v2/link/" (first links)))
       {:status  200
        :headers {"Content-Type" "text/html"
                  "Cache-Control" "no-store"}
-       :body    (group-detail-page-v2 group-id)})))
+       :body    (group-detail-page group-id)})))
 
 
-(defn handle-group-stream-v2 [pubsub {{group-id :group-id} :path-params :as request}]
+(defn handle-group-stream [pubsub {{group-id :group-id} :path-params :as request}]
   (let [ch-atom  (atom nil)
         feed-atom (atom [])
         cleanup! (fn []
