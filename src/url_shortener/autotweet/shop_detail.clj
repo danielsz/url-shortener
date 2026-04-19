@@ -1,8 +1,6 @@
 (ns url-shortener.autotweet.shop-detail
   (:require
-    [hiccup.page :refer [html5]]
-    [clojure.tools.logging :as log]
-    [url-shortener.shared.utils :refer [display-name]]))
+   [url-shortener.shared.utils :refer [display-name]]))
 
 
 (defn shop-dasboard [group-id]
