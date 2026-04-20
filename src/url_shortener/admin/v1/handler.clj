@@ -1,6 +1,5 @@
 (ns url-shortener.admin.v1.handler
   (:require
-    [hiccup2.core :as h]
     [clojure.core.async :as a :refer [chan sliding-buffer <!! sub unsub close!]]
     [hiccup.page :refer [html5]]
     [clojure.tools.logging :as log]

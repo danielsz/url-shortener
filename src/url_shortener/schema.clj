@@ -50,6 +50,7 @@
 (defn countries-key  [path] (str path ":countries"))
 (defn reports-key    [path] (str path ":reports"))
 (defn platforms-key       [path]     (str path ":platforms")) ; this is derived from referer at click time
+(defn platforms-daily-key [path platform]     (str path ":platforms:" platform ":daily"))
 (defn targets-key [path] (str path ":targets")) ; this is the intended target platform (when known) at creation/shorten time
 
 ;; -- Group key helpers --------------------------------------------------------
@@ -63,6 +64,7 @@
 (defn group-ips-key      [group-id] (str "group:" group-id ":ips"))
 (defn group-reports-key  [group-id] (str "group:" group-id ":reports"))
 (defn group-platforms-key [group-id] (str "group:" group-id ":platforms"))
+(defn group-platforms-daily-key [group-id p]  (str "group:" group-id ":platforms:" p ":daily"))
 
 ;; -- All ------------------------------------------------------------------------
 

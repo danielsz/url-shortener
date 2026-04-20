@@ -1,6 +1,6 @@
 (ns url-shortener.analytics
   (:require [url-shortener.shared.utils :refer [ip-validator epoch-now today this-week this-month]]
-            [url-shortener.schema :refer [ips-key referrers-key daily-key group-key TTL-ANALYTICS group-ips-key group-daily-key countries-key group-countries-key weekly-key monthly-key group-monthly-key group-weekly-key platforms-key group-platforms-key]]
+            [url-shortener.schema :refer [ips-key referrers-key daily-key group-key TTL-ANALYTICS group-ips-key group-daily-key countries-key group-countries-key weekly-key monthly-key group-monthly-key group-weekly-key platforms-key group-platforms-key platforms-daily-key group-platforms-daily-key]]
             [clojure.tools.logging :as log]
             [taoensso.carmine :as redis]
             [clojure.string :as str]
@@ -76,6 +76,10 @@
                     (redis/expire  (monthly-key path) TTL-ANALYTICS)
                     (redis/hincrby (platforms-key path) platform 1)
                     (redis/expire  (platforms-key path) TTL-ANALYTICS)
+                    (redis/hincrby (platforms-daily-key path platform) (today) 1)
+                    (redis/expire  (platforms-daily-key path platform) TTL-ANALYTICS)
+                    (redis/hincrby (group-platforms-daily-key group-id platform) (today) 1)
+                    (redis/expire  (group-platforms-daily-key group-id platform) TTL-ANALYTICS)
                     (redis/hincrby (group-key group-id) "clicks" 1)
                     (redis/zadd    (group-ips-key group-id) (epoch-now) remote-addr)
                     (redis/expire  (group-ips-key group-id) TTL-ANALYTICS)

@@ -7,6 +7,9 @@
    [starfederation.datastar.clojure.adapter.http-kit :refer [->sse-response on-open on-close]]
    [clojure.core.async :as async]
    [url-shortener.reports.link :as link]
+   [cheshire.core :as json]
+   [url-shortener.shared.analytics :as analytics]
+   [taoensso.carmine :as redis]
    [url-shortener.reports.group :as group]))
 
 (defn handle-create-report [{{:keys [path owner-id group-id]} :params}]
@@ -27,46 +30,45 @@
 
 (defn handle-report-stream [pubsub {{token :token} :path-params :as request}]
   (if-let [report (resolve-report token)]
-    (let [subject (get report "subject")
+    (let [subject   (get report "subject")
           type      (infer-report-type subject)
           ch-atom   (atom nil)
+          feed-atom (atom [])
           cleanup!  (fn []
                       (when-let [ch @ch-atom]
                         (log/debug "report stream closed" token)
                         (async/unsub (:publication pubsub) :analytics-update ch)
                         (async/close! ch)
-                        (reset! ch-atom nil)))]
+                        (reset! ch-atom nil)))
+          build!    (fn []
+                      (case type
+                        "link"  (assoc (analytics/link-signals subject)  :feed @feed-atom)
+                        "group" (assoc (analytics/group-signals subject) :feed @feed-atom)))
+          relevant? (fn [event]
+                      (case type
+                        "link"  (= (:path event) subject)
+                        "group" (= (:group-id event) subject)))]
       (->sse-response request
         {on-open
          (fn [sse]
-           (let [ch       (async/chan (async/sliding-buffer 10))
-                  _        (reset! ch-atom ch)
-                 push-all! (fn []
-                             (case type
-                               "link"
-                               (do
-                                 (d*/patch-elements! sse (link/render-stats subject))
-                                 (d*/patch-elements! sse (link/render-chart subject))
-                                 (d*/patch-elements! sse (link/render-countries subject))
-                                 (d*/patch-elements! sse (link/render-referrers subject)))
-                               "group"
-                               (do
-                                 (d*/patch-elements! sse (group/render-stats subject))
-                                 (d*/patch-elements! sse (group/render-chart subject))
-                                 (d*/patch-elements! sse (group/render-countries subject))
-                                 (d*/patch-elements! sse (group/render-links subject)))))
-                 relevant? (fn [event]
-                             (case type
-                               "link"  (= (:path event) subject)
-                               "group" (= (:group-id event) subject)))]
+           (let [ch (async/chan (async/sliding-buffer 10))]
+             (reset! ch-atom ch)
              (async/sub (:publication pubsub) :analytics-update ch)
-             (try               
-               (push-all!)
+             (try
+               (d*/patch-signals! sse (json/generate-string (build!)))
                (loop []
                  (when-let [event (async/<!! ch)]
                    (when (relevant? event)
                      (try
-                       (push-all!)
+                       (let [path (:path event)
+                             url  (redis/wcar nil (redis/hget path "url"))
+                             item {:short (str (System/getProperty "shortener.service") path)
+                                   :url   url
+                                   :time  (-> (java.time.LocalTime/now)
+                                              (.truncatedTo java.time.temporal.ChronoUnit/SECONDS)
+                                              str)}]
+                         (swap! feed-atom #(vec (take 5 (cons item %)))))
+                       (d*/patch-signals! sse (json/generate-string (build!)))
                        (catch Exception e (log/error "push failed" (.getMessage e)))))
                    (recur)))
                (catch Exception e (log/error "stream failed" (.getMessage e))))))

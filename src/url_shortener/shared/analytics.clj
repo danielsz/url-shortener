@@ -2,9 +2,9 @@
   (:require
     [taoensso.carmine :as redis]
     [url-shortener.schema :refer
-     [group-key group-links-key group-ips-key group-daily-key group-weekly-key
-      group-monthly-key group-countries-key group-platforms-key
-      ips-key daily-key weekly-key monthly-key countries-key platforms-key
+     [group-key group-links-key group-ips-key group-daily-key
+      group-countries-key group-platforms-key
+      ips-key daily-key countries-key platforms-key platforms-daily-key group-platforms-daily-key
       referrers-key targets-key]]))
 
 ;; ---------------------------------------------------------------------------
@@ -142,3 +142,34 @@
        (sort-by val >)
        (take 10)
        (into {})))
+
+(defn link-signals [path]
+  (let [{:keys [platforms confirmed]} (link-platforms path)]
+    (cond-> {:stats     (link-stats path)
+             :countries (link-countries path)
+             :platforms platforms
+             :daily     (link-daily path)
+             :feed      []}
+      (seq confirmed) (assoc :confirmed confirmed))))
+
+(defn group-signals [group-id]
+  (let [{:keys [platforms confirmed]} (group-platforms group-id)]
+    (cond-> {:stats     (group-stats group-id)
+             :countries (group-countries group-id)
+             :platforms platforms
+             :daily     (group-daily group-id)
+             :links     (group-links group-id)
+             :feed      []}
+      (seq confirmed) (assoc :confirmed confirmed))))
+
+(defn link-daily [path]
+  (let [known-platforms (keys (hgetall->map (platforms-key path)))]
+    (into {"all" (hgetall->map (daily-key path))}
+          (map (fn [p] [p (hgetall->map (platforms-daily-key path p))]))
+          known-platforms)))
+
+(defn group-daily [group-id]
+  (let [known-platforms (keys (hgetall->map (group-platforms-key group-id)))]
+    (into {"all" (hgetall->map (group-daily-key group-id))}
+          (map (fn [p] [p (hgetall->map (group-platforms-daily-key group-id p))]))
+          known-platforms)))
