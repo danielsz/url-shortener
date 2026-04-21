@@ -31,8 +31,6 @@
     {:total_clicks    (parse-long (or clicks "0"))
      :unique_visitors (or unique-ips 0)}))
 
-(defn link-daily [path]
-  {"all" (hgetall->map (daily-key path))})
 
 (defn link-countries [path]
   (hgetall->map (countries-key path)))
@@ -65,7 +63,11 @@
      :links           (or link-count 0)}))
 
 (defn group-daily [group-id]
-  {"all" (hgetall->map (group-daily-key group-id))})
+  (let [known-platforms (keys (hgetall->map (group-platforms-key group-id)))]
+    (into {"all" (hgetall->map (group-daily-key group-id))}
+          (map (fn [p] [p (hgetall->map (group-platforms-daily-key group-id p))]))
+          known-platforms)))
+
 
 (defn group-countries [group-id]
   (hgetall->map (group-countries-key group-id)))
@@ -143,6 +145,12 @@
        (take 10)
        (into {})))
 
+(defn link-daily [path]
+  (let [known-platforms (keys (hgetall->map (platforms-key path)))]
+    (into {"all" (hgetall->map (daily-key path))}
+          (map (fn [p] [p (hgetall->map (platforms-daily-key path p))]))
+          known-platforms)))
+
 (defn link-signals [path]
   (let [{:keys [platforms confirmed]} (link-platforms path)]
     (cond-> {:stats     (link-stats path)
@@ -162,14 +170,4 @@
              :feed      []}
       (seq confirmed) (assoc :confirmed confirmed))))
 
-(defn link-daily [path]
-  (let [known-platforms (keys (hgetall->map (platforms-key path)))]
-    (into {"all" (hgetall->map (daily-key path))}
-          (map (fn [p] [p (hgetall->map (platforms-daily-key path p))]))
-          known-platforms)))
 
-(defn group-daily [group-id]
-  (let [known-platforms (keys (hgetall->map (group-platforms-key group-id)))]
-    (into {"all" (hgetall->map (group-daily-key group-id))}
-          (map (fn [p] [p (hgetall->map (group-platforms-daily-key group-id p))]))
-          known-platforms)))
