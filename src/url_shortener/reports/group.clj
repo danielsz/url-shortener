@@ -4,7 +4,7 @@
    [url-shortener.shared.utils :refer [find-or-create-report!]]
    [clojure.tools.logging :as log]
    [ring.util.response :refer [response status]]
-   [url-shortener.shared.pages.v2 :as pages]
+   [url-shortener.shared.pages.v2.dashboard :as pages]
    [url-shortener.schema :refer [group-key group-reports-key]]))
 
 

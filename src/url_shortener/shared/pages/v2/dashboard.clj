@@ -1,7 +1,17 @@
-(ns url-shortener.shared.pages.v2
+(ns url-shortener.shared.pages.v2.dashboard
   (:require
    [hiccup.page :refer [html5]]
    [url-shortener.shared.utils :refer [display-name]]))
+
+(defn- head-links [& page-css]
+  ;; Load order: tokens → reset → primitives → components → page
+  (list
+   [:link {:rel "stylesheet" :href "/css/v2/tokens.css"}]
+   [:link {:rel "stylesheet" :href "/css/v2/reset.css"}]
+   [:link {:rel "stylesheet" :href "/css/v2/primitives.css"}]
+   [:link {:rel "stylesheet" :href "/css/v2/components.css"}]
+   (for [href page-css]
+     [:link {:rel "stylesheet" :href href}])))
 
 (defn group-dashboard-page [group-id stream-url back-link]
   (html5
@@ -9,7 +19,7 @@
      [:meta {:charset "utf-8"}]
      [:meta {:name "viewport" :content "width=device-width, initial-scale=1"}]
      [:title (str (display-name group-id) " — Analytics")]
-     [:link {:rel "stylesheet" :href "/css/v2/v2.css"}]
+     (head-links "/css/v2/dashboard.css")
      [:script {:src "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"}]
      [:script {:type "module"
                :src  "https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.8/bundles/datastar.js"}]]
@@ -19,7 +29,9 @@
             :data-on:datastar-fetch "el === evt.detail.el && ((evt.detail.type.startsWith('datastar') && ($connected = true)) || (['retrying', 'error', 'finished'].includes(evt.detail.type) && ($connected = false)))"}
       [:main.center
        [:div.stack
-        [:header.header
+        ;; Header: .spread--end handles space-between layout;
+        ;; .header adds padding + border decoration
+        [:header.spread.spread--end.header
          [:div.stack.stack--tight
           [:div.cluster.cluster--tight
            [:span.label-tiny "tuppu.net · " (display-name group-id) " ·"]
@@ -29,11 +41,13 @@
           [:p.sub-label "total clicks"]]
          [:div.header-right "Q = quantitative · O = ordinal · N = nominal"]]
 
-        [:div.dashboard-grid
-         [:div.col-side
+        ;; Two-column layout: sidebar-layout (row-reverse: side declared first in DOM,
+        ;; but rendered right; main grows to fill remaining space)
+        [:div.sidebar-layout
+         [:div.sidebar-layout__side
           [:div.pnl.stack
            [:div.pnl-title "Overview"]
-           [:div.switcher.stat-switcher
+           [:div.switcher.switcher--stat
             [:div.stat-cell
              [:div.stat-val {:data-text "$stats.total_clicks.toLocaleString()"}]
              [:div.stat-lbl "Clicks"]]
@@ -57,21 +71,19 @@
            [:span.enc-tag "Observed platform ∈ intended targets"]
            [:div.panel-body {:id "confirmed-panel"}]]]
 
-         [:div.col-main
-          [:div.col-chart
-           [:div.pnl.stack
-            [:div.pnl-title "Clicks over time — daily"]
-            [:div.chart-wrap
-             [:canvas {:id "tsChart"}]]]]
+         [:div.sidebar-layout__main
+          [:div.pnl.stack
+           [:div.pnl-title "Clicks over time — daily"]
+           [:div.chart-wrap
+            [:canvas {:id "tsChart"}]]]
           [:div.pnl.stack.pnl--conditional
            {:id        "feed-pnl"
             :data-show "$feed && $feed.length > 0"}
            [:div.pnl-title "Recent clicks"]
            [:div.panel-body {:id "feed-panel"}]]
-          [:div.col-links
-           [:div.pnl.stack
-            [:div.pnl-title "Links by volume"]
-            [:div.panel-body {:id "links-panel"}]]]]]
+          [:div.pnl.stack
+           [:div.pnl-title "Links by volume"]
+           [:div.panel-body {:id "links-panel"}]]]]
 
         (when back-link
           [:div.back-link [:a {:href (second back-link)} (first back-link)]])]]]
@@ -83,7 +95,7 @@
      [:meta {:charset "utf-8"}]
      [:meta {:name "viewport" :content "width=device-width, initial-scale=1"}]
      [:title (str (or description url) " — Analytics")]
-     [:link {:rel "stylesheet" :href "/css/v2/v2.css"}]
+     (head-links "/css/v2/dashboard.css")
      [:script {:src "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"}]
      [:script {:type "module"
                :src  "https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.8/bundles/datastar.js"}]]
@@ -93,7 +105,7 @@
             :data-on:datastar-fetch "el === evt.detail.el && ((evt.detail.type.startsWith('datastar') && ($connected = true)) || (['retrying', 'error', 'finished'].includes(evt.detail.type) && ($connected = false)))"}
       [:main.center
        [:div.stack
-        [:header.header
+        [:header.spread.spread--end.header
          [:div.stack.stack--tight
           [:div.cluster.cluster--tight
            [:span.label-tiny "tuppu.net · " path " ·"]
@@ -103,11 +115,11 @@
           [:p.sub-label "total clicks"]]
          [:div.header-right "Q = quantitative · O = ordinal · N = nominal"]]
 
-        [:div.dashboard-grid
-         [:div.col-side
+        [:div.sidebar-layout
+         [:div.sidebar-layout__side
           [:div.pnl.stack
            [:div.pnl-title "Overview"]
-           [:div.switcher.stat-switcher
+           [:div.switcher.switcher--stat
             [:div.stat-cell
              [:div.stat-val {:data-text "$stats.total_clicks.toLocaleString()"}]
              [:div.stat-lbl "Clicks"]]
@@ -128,12 +140,11 @@
            [:span.enc-tag "Observed platform ∈ intended targets"]
            [:div.panel-body {:id "confirmed-panel"}]]]
 
-         [:div.col-main
-          [:div.col-chart
-           [:div.pnl.stack
-            [:div.pnl-title "Clicks over time — daily"]
-            [:div.chart-wrap
-             [:canvas {:id "tsChart"}]]]]
+         [:div.sidebar-layout__main
+          [:div.pnl.stack
+           [:div.pnl-title "Clicks over time — daily"]
+           [:div.chart-wrap
+            [:canvas {:id "tsChart"}]]]
           [:div.pnl.stack.pnl--conditional
            {:id        "feed-pnl"
             :data-show "$feed && $feed.length > 0"}
@@ -149,3 +160,7 @@
         (when back-link
           [:div.back-link [:a {:href (second back-link)} (first back-link)]])]]]
      [:script {:src "/js/group-dashboard.js"}]]))
+
+
+
+

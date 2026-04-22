@@ -1,0 +1,46 @@
+/* ============================================================================
+   reset.css — tuppu.net
+   Minimal reset. Scope: universal box model + base typography only.
+   No layout, no color, no component rules here.
+   ============================================================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* Prevent font-size inflation on iOS */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--mono);
+  background: var(--bg0);
+  color: var(--text);
+  font-size: var(--step-0);
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Remove list markers only when a list is used for layout */
+ul:where([class]) {
+  list-style: none;
+}
+
+img, video, svg {
+  display: block;
+  max-inline-size: 100%;
+}
+
+/* Inherit font in form elements — browsers don't by default */
+input, button, textarea, select {
+  font: inherit;
+}

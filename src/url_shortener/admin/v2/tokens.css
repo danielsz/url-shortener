@@ -1,0 +1,139 @@
+/* ============================================================================
+   tokens.css — tuppu.net design system
+   Single source of truth for all custom properties.
+   No selectors other than :root and the dark-mode media query.
+
+   Utopia fluid scales — generated for min 320px / max 1240px, base 16px
+   Every Layout space tokens — https://every-layout.dev
+   Bertin (1967) nominal encoding for platform hues
+   ============================================================================ */
+
+:root {
+
+  /* --------------------------------------------------------------------------
+     Space scale
+     3xs · 2xs · xs · s · m · l · xl
+     -------------------------------------------------------------------------- */
+
+  --space-3xs: clamp(0.25rem, 0.23rem + 0.11vw, 0.31rem);
+  --space-2xs: clamp(0.50rem, 0.46rem + 0.22vw, 0.63rem);
+  --space-xs:  clamp(0.75rem, 0.69rem + 0.33vw, 0.94rem);
+  --space-s:   clamp(1.00rem, 0.91rem + 0.43vw, 1.25rem);
+  --space-m:   clamp(1.50rem, 1.37rem + 0.65vw, 1.88rem);
+  --space-l:   clamp(2.00rem, 1.83rem + 0.87vw, 2.50rem);
+  --space-xl:  clamp(3.00rem, 2.74rem + 1.30vw, 3.75rem);
+  --space-2xl: clamp(4.00rem, 3.65rem + 1.74vw, 5.00rem);
+
+  /* --------------------------------------------------------------------------
+     Space pairings — fluid transitions between two steps
+     -------------------------------------------------------------------------- */
+
+  --space-3xs-2xs: clamp(0.25rem, 0.12rem + 0.65vw, 0.63rem);
+  --space-2xs-xs:  clamp(0.50rem, 0.35rem + 0.76vw, 0.94rem);
+  --space-xs-s:    clamp(0.75rem, 0.58rem + 0.87vw, 1.25rem);
+  --space-s-m:     clamp(1.00rem, 0.70rem + 1.52vw, 1.88rem);
+  --space-m-l:     clamp(1.50rem, 1.05rem + 2.28vw, 2.50rem);
+  --space-l-xl:    clamp(2.00rem, 1.41rem + 2.93vw, 3.75rem);
+  --space-s-l:     clamp(1.00rem, 0.48rem + 2.61vw, 2.50rem);
+  --space-xl-2xl:  clamp(3.00rem, 2.13rem + 4.35vw, 5.00rem);
+
+  /* --------------------------------------------------------------------------
+     Type scale — minor third, fluid
+     -------------------------------------------------------------------------- */
+
+  --step--2: clamp(0.56rem, 0.54rem + 0.11vw, 0.63rem);
+  --step--1: clamp(0.69rem, 0.65rem + 0.22vw, 0.81rem);
+  --step-0:  clamp(0.88rem, 0.80rem + 0.37vw, 1.06rem);
+  --step-1:  clamp(1.06rem, 0.96rem + 0.54vw, 1.31rem);
+  --step-2:  clamp(1.31rem, 1.14rem + 0.87vw, 1.69rem);
+  --step-3:  clamp(1.63rem, 1.35rem + 1.41vw, 2.19rem);
+  --step-4:  clamp(2.00rem, 1.59rem + 2.07vw, 2.75rem);
+  --step-5:  clamp(2.50rem, 1.89rem + 3.04vw, 3.50rem);
+  --step-6:  clamp(3.00rem, 2.26rem + 3.70vw, 4.50rem);
+  --step-7:  clamp(3.50rem, 2.54rem + 4.78vw, 6.00rem);
+
+  /* --------------------------------------------------------------------------
+     Measure — max line length for prose
+     -------------------------------------------------------------------------- */
+
+  --measure: 80rem;
+
+  /* --------------------------------------------------------------------------
+     Surfaces
+     -------------------------------------------------------------------------- */
+
+  --bg0: #f5f4f0; /* page background    */
+  --bg1: #ffffff; /* card / panel       */
+  --bg2: #eeede8; /* subtle fill, track */
+  --bg3: #e8e7e1; /* pressed / hover    */
+
+  /* --------------------------------------------------------------------------
+     Borders
+     -------------------------------------------------------------------------- */
+
+  --border:   rgba(0, 0, 0, 0.10);
+  --border-s: rgba(0, 0, 0, 0.18);
+
+  /* --------------------------------------------------------------------------
+     Text
+     -------------------------------------------------------------------------- */
+
+  --text:   #1a1a18; /* primary   */
+  --text-s: #5c5c58; /* secondary */
+  --text-t: #888780; /* tertiary / muted */
+
+  /* --------------------------------------------------------------------------
+     Shape & typography
+     -------------------------------------------------------------------------- */
+
+  --radius: 8px;
+  --mono:   'Courier New', 'Menlo', 'Monaco', monospace;
+
+  /* --------------------------------------------------------------------------
+     Blue accent — steel, warm against beige
+     -------------------------------------------------------------------------- */
+
+  --blue:   #4A8FC2;
+  --blue-l: #EBF3FA; /* tinted fill */
+  --blue-s: #2E6E9E; /* stronger    */
+
+  /* --------------------------------------------------------------------------
+     Platform hues — Bertin nominal encoding
+     Used for N (nominal) data only, never for Q (quantitative) encoding
+     -------------------------------------------------------------------------- */
+
+  --c-direct:              #7a7970;
+  --c-twitter:             #378ADD;
+  --c-twitter-aggregator:  #5B9BD5;
+  --c-mastodon:            #6364FF;
+  --c-bluesky:             #0085FF;
+  --c-facebook:            #1D9E75;
+  --c-instagram:           #D85A30;
+  --c-linkedin:            #BA7517;
+  --c-pinterest:           #9B4F96;
+  --c-google:              #E8A020;
+  --c-other:               #888780;
+
+  /* live-signal dot */
+  --c-signal: #378ADD;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg0: #141412;
+    --bg1: #1e1e1b;
+    --bg2: #242420;
+    --bg3: #2c2c28;
+
+    --border:   rgba(255, 255, 255, 0.08);
+    --border-s: rgba(255, 255, 255, 0.14);
+
+    --text:   #e8e7e2;
+    --text-s: #a8a79f;
+    --text-t: #666660;
+
+    --blue:   #5BA3D8;
+    --blue-l: #1a2e3f;
+    --blue-s: #7DBDE8;
+  }
+}

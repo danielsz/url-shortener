@@ -7,7 +7,7 @@
     [url-shortener.shared.analytics :as analytics]
     [taoensso.carmine :as redis]
     [cheshire.core :as json]
-    [url-shortener.shared.pages.v2 :as pages]))
+    [url-shortener.shared.pages.v2.dashboard :as pages]))
 
 
 (defn- link-detail-page [path]

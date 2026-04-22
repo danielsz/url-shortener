@@ -4,7 +4,7 @@
    [url-shortener.shared.utils :refer [find-or-create-report!]]
    [url-shortener.schema :refer [reports-key]]
    [ring.util.response :refer [response status]]
-   [url-shortener.shared.pages.v2 :as pages]))
+   [url-shortener.shared.pages.v2.dashboard :as pages]))
 
 
 (defn create-link-report! [owner-id path]

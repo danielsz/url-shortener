@@ -1,0 +1,412 @@
+/* ============================================================================
+   components.css — tuppu.net
+   Shared UI components used across dashboard, homepage, and start page.
+   Depends on: tokens.css, reset.css, primitives.css
+   ============================================================================ */
+
+/* ----------------------------------------------------------------------------
+   Wordmark
+   ---------------------------------------------------------------------------- */
+
+.wordmark {
+  font-size: var(--step-0);
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+
+.wordmark__dot {
+  color: var(--blue);
+}
+
+/* ----------------------------------------------------------------------------
+   Panel
+   Raised surface. Compose with .stack, .box, .cluster from primitives.
+   ---------------------------------------------------------------------------- */
+
+.pnl {
+  background: var(--bg1);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-s);
+}
+
+.pnl.stack > * + * {
+  margin-block-start: var(--space-xs);
+}
+
+.pnl--confirmed {
+  border-color: var(--border-s);
+}
+
+.pnl-title {
+  font-size: var(--step--2);
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--text-t);
+}
+
+/* ----------------------------------------------------------------------------
+   Panel body
+   ---------------------------------------------------------------------------- */
+
+.panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.panel-body--tight {
+  gap: var(--space-3xs);
+}
+
+/* ----------------------------------------------------------------------------
+   Typography utilities
+   ---------------------------------------------------------------------------- */
+
+.label-tiny {
+  font-size: var(--step--2);
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--text-t);
+}
+
+.total-clicks {
+  font-size: var(--step-5);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--text);
+}
+
+.sub-label {
+  font-size: var(--step--1);
+  color: var(--text-t);
+}
+
+.note {
+  font-size: var(--step--2);
+  color: var(--text-t);
+  line-height: 1.5;
+  font-style: italic;
+}
+
+/* ----------------------------------------------------------------------------
+   Encoding tag — Bertin legend annotation
+   ---------------------------------------------------------------------------- */
+
+.enc-tag {
+  display: inline-block;
+  font-size: var(--step--2);
+  color: var(--text-t);
+  border: 0.5px solid var(--border);
+  padding-block: 1px;
+  padding-inline: var(--space-3xs);
+  border-radius: 3px;
+}
+
+/* ----------------------------------------------------------------------------
+   Live dot — Peirce indexical sign
+   Active: animated blue signal
+   Inactive (.live-dot — no .active): static grey
+   ---------------------------------------------------------------------------- */
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+.live-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--c-signal);
+  display: inline-block;
+  animation: pulse 1.8s ease-in-out infinite;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.live-dot:not(.active) {
+  background: var(--text-t);
+  animation: none;
+}
+
+/* Blue variant — for homepage / start (not dashboard signal) */
+.live-dot--blue {
+  background: var(--blue);
+}
+
+/* ----------------------------------------------------------------------------
+   Stat cell
+   ---------------------------------------------------------------------------- */
+
+.stat-cell {
+  text-align: center;
+  padding-block: var(--space-3xs);
+}
+
+.stat-val {
+  font-size: var(--step-3);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--text);
+}
+
+.stat-lbl {
+  font-size: var(--step--2);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-t);
+  margin-block-start: var(--space-3xs);
+}
+
+/* ----------------------------------------------------------------------------
+   Bar — shared track / fill
+   Used by: platform rows, country rows, link volume
+   ---------------------------------------------------------------------------- */
+
+/* position:relative is load-bearing — .bar-fill is position:absolute */
+.bar-track {
+  block-size: 3px;
+  background: var(--bg2);
+  border-radius: 1px;
+  position: relative;
+}
+
+.bar-track-4 {
+  block-size: 4px;
+  background: var(--bg2);
+  border-radius: 1px;
+  position: relative;
+}
+
+.bar-fill {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  block-size: 100%;
+  border-radius: 1px;
+  transition: inline-size 0.4s ease;
+}
+
+.bar-label {
+  font-size: var(--step--1);
+  color: var(--text-s);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bar-count {
+  font-size: var(--step--1);
+  color: var(--text-t);
+  text-align: end;
+}
+
+/* ----------------------------------------------------------------------------
+   Platform source row
+   ---------------------------------------------------------------------------- */
+
+.ref-label-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.ref-source {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3xs);
+  font-size: var(--step--2);
+  color: var(--text-s);
+}
+
+.src-dot {
+  width: 5px;
+  height: 5px;
+  flex-shrink: 0;
+  border-radius: 1px;
+}
+
+/* ----------------------------------------------------------------------------
+   Country row
+   ---------------------------------------------------------------------------- */
+
+.country-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-xs);
+  padding-block: var(--space-3xs);
+  border-bottom: 0.5px solid var(--border);
+  font-size: var(--step--2);
+  color: var(--text-s);
+}
+
+.country-bar {
+  flex: 1;
+  block-size: 2px;
+  background: var(--bg2);
+  position: relative;
+}
+
+.country-bar-fill {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  block-size: 100%;
+  background: var(--text-t);
+  opacity: 0.4;
+  transition: inline-size 0.4s ease;
+}
+
+.country-count {
+  color: var(--text-t);
+  min-inline-size: 24px;
+  text-align: end;
+}
+
+/* ----------------------------------------------------------------------------
+   Confirmed row
+   ---------------------------------------------------------------------------- */
+
+.confirmed-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-xs);
+  padding-block: var(--space-3xs);
+  border-bottom: 0.5px solid var(--border);
+  font-size: var(--step--2);
+  color: var(--text-s);
+}
+
+.confirmed-rate {
+  font-size: var(--step--1);
+  font-weight: 500;
+  color: var(--text);
+}
+
+/* ----------------------------------------------------------------------------
+   Live feed rows
+   ---------------------------------------------------------------------------- */
+
+.feed-row {
+  padding-block: var(--space-3xs);
+  border-bottom: 0.5px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+}
+
+.feed-row__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-s);
+}
+
+.feed-short {
+  font-size: var(--step--1);
+  color: var(--text-s);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-inline-size: 0;
+}
+
+.feed-time {
+  font-size: var(--step--2);
+  color: var(--text-t);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.feed-url {
+  font-size: var(--step--2);
+  color: var(--text-t);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ----------------------------------------------------------------------------
+   Back link
+   ---------------------------------------------------------------------------- */
+
+.back-link {
+  display: inline-block;
+  padding-block: var(--space-s);
+  font-size: var(--step--1);
+  color: var(--text-t);
+}
+
+.back-link:hover {
+  color: var(--text-s);
+}
+
+/* ----------------------------------------------------------------------------
+   Link metadata
+   ---------------------------------------------------------------------------- */
+
+.link-url {
+  font-size: var(--step--2);
+  word-break: break-all;
+  overflow-wrap: anywhere;
+}
+
+.link-desc {
+  font-size: var(--step--2);
+  color: var(--text-s);
+}
+
+/* ----------------------------------------------------------------------------
+   Buttons — shared base
+   ---------------------------------------------------------------------------- */
+
+.btn {
+  font-family: var(--mono);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 0;
+  line-height: 1;
+}
+
+.btn--primary {
+  font-size: var(--step--1);
+  letter-spacing: 0.08em;
+  background: var(--text);
+  color: var(--bg0);
+  padding: var(--space-xs) var(--space-m);
+  border-radius: var(--radius);
+  transition: opacity 0.2s;
+}
+
+.btn--primary:hover    { opacity: 0.8; }
+.btn--primary:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.btn--primary-lg { font-size: var(--step-0); }
+
+.btn--cta {
+  font-size: var(--step--1);
+  letter-spacing: 0.08em;
+  color: var(--blue);
+  border: 0.5px solid var(--blue);
+  padding: var(--space-3xs) var(--space-xs);
+  border-radius: var(--radius);
+  transition: background 0.2s, color 0.2s;
+}
+
+.btn--cta:hover {
+  background: var(--blue);
+  color: var(--bg1);
+}
+
+.btn--ghost {
+  font-size: var(--step--1);
+  letter-spacing: 0.06em;
+  color: var(--text-t);
+  padding: var(--space-xs);
+}
+
