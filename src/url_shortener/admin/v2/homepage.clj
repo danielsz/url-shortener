@@ -1,8 +1,9 @@
 (ns url-shortener.admin.v2.homepage
   (:require
    [hiccup2.core :as h]
-   [hiccup.page :refer [html5 doctype]]
+   [hiccup.page :refer [html5 doctype include-css]]
    [ring.util.response :refer [response content-type]]
+   [url-shortener.shared.utils :refer [dev?]]
    [clojure.tools.logging :as log]))
 
 
@@ -352,12 +353,14 @@
    [:meta {:charset "UTF-8"}]
    [:meta {:name "viewport" :content "width=device-width, initial-scale=1.0"}]
    [:title "tuppu.net — link analytics with platform intelligence"]
-   ;; Load order: tokens → reset → primitives → components → page
-   [:link {:rel "stylesheet" :href "/css/v2/tokens.css"}]
-   [:link {:rel "stylesheet" :href "/css/v2/reset.css"}]
-   [:link {:rel "stylesheet" :href "/css/v2/primitives.css"}]
-   [:link {:rel "stylesheet" :href "/css/v2/components.css"}]
-   [:link {:rel "stylesheet" :href "/css/v2/homepage.css"}]])
+   (if (dev?)
+    (include-css "/css/v2/tokens.css"
+                 "/css/v2/reset.css"
+                 "/css/v2/primitives.css"
+                 "/css/v2/components.css"
+                 "/css/v2/homepage.css")
+        (include-css "/css/styles.min.css"))
+   ])
 
 (defn page []
   (str

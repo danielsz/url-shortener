@@ -1,6 +1,6 @@
 {:pom {:group-id "org.danielsz",
        :artifact-id "url-shortener",
-       :version "1.4.0",
+       :version "1.4.1",
        :name "url-shortener"},
  :packaging {:uberjar {:graalvm {:enabled false,
                                  :with-https false,
@@ -17,6 +17,15 @@
                        :build-properties {:main-class "url_shortener.core",
                                           :javafx-class "main.core.App"
                                           :project-build-sourceEncoding "UTF-8"},
+                       :resources {:css {:enabled true
+                                         :css-source-include "v2/**"
+                                         :css-source-exclude "**/*.min.css"
+                                         :css-final-file "styles.css"
+                                         :web-app-source-dir "resources/public"
+                                         :css-source-dir "css"}
+                                   :images {:enabled false
+                                            :png {:dirs []}
+                                            :jpg {:dirs []}}}
                        :enabled true},
              :jar {:enabled false}},
  :testing {:enabled false, :tools-deps-alias :test},

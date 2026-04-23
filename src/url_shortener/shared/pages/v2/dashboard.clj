@@ -1,17 +1,16 @@
 (ns url-shortener.shared.pages.v2.dashboard
   (:require
-   [hiccup.page :refer [html5]]
-   [url-shortener.shared.utils :refer [display-name]]))
+   [hiccup.page :refer [html5 include-css]]
+   [url-shortener.shared.utils :refer [display-name dev?]]))
 
-(defn- head-links [& page-css]
-  ;; Load order: tokens → reset → primitives → components → page
-  (list
-   [:link {:rel "stylesheet" :href "/css/v2/tokens.css"}]
-   [:link {:rel "stylesheet" :href "/css/v2/reset.css"}]
-   [:link {:rel "stylesheet" :href "/css/v2/primitives.css"}]
-   [:link {:rel "stylesheet" :href "/css/v2/components.css"}]
-   (for [href page-css]
-     [:link {:rel "stylesheet" :href href}])))
+(defn- head-links []
+  (if (dev?)
+    (include-css "/css/v2/tokens.css"
+                 "/css/v2/reset.css"
+                 "/css/v2/primitives.css"
+                 "/css/v2/components.css"
+                 "/css/v2/dashboard.css")
+        (include-css "/css/styles.min.css")))
 
 (defn group-dashboard-page [group-id stream-url back-link]
   (html5
@@ -19,7 +18,7 @@
      [:meta {:charset "utf-8"}]
      [:meta {:name "viewport" :content "width=device-width, initial-scale=1"}]
      [:title (str (display-name group-id) " — Analytics")]
-     (head-links "/css/v2/dashboard.css")
+     (head-links)
      [:script {:src "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"}]
      [:script {:type "module"
                :src  "https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.8/bundles/datastar.js"}]]
@@ -95,7 +94,7 @@
      [:meta {:charset "utf-8"}]
      [:meta {:name "viewport" :content "width=device-width, initial-scale=1"}]
      [:title (str (or description url) " — Analytics")]
-     (head-links "/css/v2/dashboard.css")
+     (head-links)
      [:script {:src "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"}]
      [:script {:type "module"
                :src  "https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.8/bundles/datastar.js"}]]

@@ -62,3 +62,9 @@
             (redis/expire (report-key token) TTL-REPORT)
             (redis/sadd   (reports-key-fn subject) token))
           token))))
+
+(defn dev? []
+  (if-let [port (System/getProperty "http.port")]
+    (= (Integer. port) 8088)
+    false))
+

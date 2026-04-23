@@ -15,6 +15,7 @@ const PLATFORMS = {
     'email':              { label: 'Email',           hex: '#4A90A4' },
     'direct':             { label: 'Direct',          hex: '#7a7970' },
     'other':              { label: 'Other',           hex: '#888780' },
+    'all':                { label: 'All',             hex: '#4A8FC2' },  // --blue
 };
 
 const isDark    = matchMedia('(prefers-color-scheme: dark)').matches;
