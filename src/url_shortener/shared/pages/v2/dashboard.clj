@@ -4,7 +4,7 @@
    [url-shortener.shared.utils :refer [display-name dev?]]))
 
 (defn- head-links []
-  (if (dev?)
+  (if true ; (dev?)
     (include-css "/css/v2/tokens.css"
                  "/css/v2/reset.css"
                  "/css/v2/primitives.css"
@@ -58,17 +58,17 @@
              [:div.stat-lbl "Links"]]]]
           [:div.pnl.stack
            [:div.pnl-title "Top countries"]
-           [:div.panel-body {:id "countries-panel"}]]
+           [:div.stack.stack--xs {:id "countries-panel"}]]
           [:div.pnl.stack
            [:div.pnl-title "Sources"]
-           [:div.panel-body {:id "platforms-panel"}]
+           [:div.stack.stack--xs {:id "platforms-panel"}]
            [:p.note "No pie — angle encodes Q data poorly."]]
           [:div.pnl.stack.pnl--confirmed.pnl--conditional
            {:id        "confirmed-pnl"
             :data-show "$confirmed && Object.keys($confirmed).length > 0"}
            [:div.pnl-title "Platform confirmation"]
            [:span.enc-tag "Observed platform ∈ intended targets"]
-           [:div.panel-body {:id "confirmed-panel"}]]]
+           [:div.stack.stack--xs {:id "confirmed-panel"}]]]
 
          [:div.sidebar-layout__main
           [:div.pnl.stack
@@ -79,10 +79,10 @@
            {:id        "feed-pnl"
             :data-show "$feed && $feed.length > 0"}
            [:div.pnl-title "Recent clicks"]
-           [:div.panel-body {:id "feed-panel"}]]
+           [:div.stack.stack--xs {:id "feed-panel"}]]
           [:div.pnl.stack
            [:div.pnl-title "Links by volume"]
-           [:div.panel-body {:id "links-panel"}]]]]
+           [:div.stack.stack--xs {:id "links-panel"}]]]]
 
         (when back-link
           [:div.back-link [:a {:href (second back-link)} (first back-link)]])]]]
@@ -127,17 +127,17 @@
              [:div.stat-lbl "Visitors"]]]]
           [:div.pnl.stack
            [:div.pnl-title "Top countries"]
-           [:div.panel-body {:id "countries-panel"}]]
+           [:div.stack.stack--xs {:id "countries-panel"}]]
           [:div.pnl.stack
            [:div.pnl-title "Sources"]
-           [:div.panel-body {:id "platforms-panel"}]
+           [:div.stack.stack--xs {:id "platforms-panel"}]
            [:p.note "No pie — angle encodes Q data poorly."]]
           [:div.pnl.stack.pnl--confirmed.pnl--conditional
            {:id        "confirmed-pnl"
             :data-show "$confirmed && Object.keys($confirmed).length > 0"}
            [:div.pnl-title "Platform confirmation"]
            [:span.enc-tag "Observed platform ∈ intended targets"]
-           [:div.panel-body {:id "confirmed-panel"}]]]
+           [:div.stack.stack--xs {:id "confirmed-panel"}]]]
 
          [:div.sidebar-layout__main
           [:div.pnl.stack
@@ -148,10 +148,10 @@
            {:id        "feed-pnl"
             :data-show "$feed && $feed.length > 0"}
            [:div.pnl-title "Recent clicks"]
-           [:div.panel-body {:id "feed-panel"}]]
+           [:div.stack.stack--xs {:id "feed-panel"}]]
           [:div.pnl.stack
            [:div.pnl-title "Destination"]
-           [:div.panel-body
+           [:div.stack.stack--xs
             [:a.link-url {:href url :target "_blank"} url]
             (when (seq description)
               [:div.link-desc description])]]]]

@@ -9,29 +9,6 @@
    · Genuinely specific layouts that primitives can't express
    ============================================================================ */
 
-/* ----------------------------------------------------------------------------
-   Nav
-   HTML uses: <nav class="hp-nav"> / <div class="center spread"> /
-              <ul class="cluster cluster--m hp-nav__links">
-   ---------------------------------------------------------------------------- */
-
-.hp-nav {
-  padding-block: var(--space-s);
-  border-bottom: 0.5px solid var(--border);
-  position: sticky;
-  top: 0;
-  background: var(--bg0);
-  z-index: 10;
-}
-
-/* Typography and colour only — layout is .cluster--m in HTML */
-.hp-nav__links {
-  font-size: var(--step--1);
-  color: var(--text-t);
-  letter-spacing: 0.06em;
-}
-
-.hp-nav__links a:hover { color: var(--text-s); }
 
 /* ----------------------------------------------------------------------------
    Sections

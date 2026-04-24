@@ -146,7 +146,7 @@ function renderCountries(countries) {
     }
     const max = entries[0][1];
     el.innerHTML = entries.map(([code, n]) => `
-        <div class="country-row">
+        <div class="country-row spread">
             <span>${code}</span>
             <div class="country-bar">
                 <div class="country-bar-fill" style="width:${(n / max * 100).toFixed(1)}%;"></div>
@@ -173,7 +173,7 @@ function renderPlatforms(platforms) {
         return `
             <div>
                 <div class="ref-label-row">
-                    <div class="ref-source">
+                    <div class="ref-source cluster cluster--tight">
                         <div class="src-dot" style="background:${p.hex};"></div>
                         ${p.label}
                     </div>
@@ -195,8 +195,8 @@ function renderFeed(feed) {
     const el = document.getElementById('feed-panel');
     if (!el || !feed) return;
     el.innerHTML = feed.map((item, i) => `
-        <div class="feed-row" style="opacity:${Math.max(0.3, 1 - i * 0.15)};">
-            <div class="feed-row__top">
+        <div class="feed-row stack stack--tight" style="opacity:${Math.max(0.3, 1 - i * 0.15)};">
+            <div class="feed-row__top spread spread--baseline">
                 <div class="feed-short">${item.short}</div>
                 <time class="feed-time">${item.time}</time>
             </div>
@@ -216,8 +216,8 @@ function renderConfirmed(confirmed, platforms) {
         const total = (platforms && platforms[key]) || confirmedN;
         const rate  = (confirmedN / total * 100).toFixed(1);
         return `
-            <div class="confirmed-row">
-                <div class="ref-source">
+            <div class="confirmed-row spread">
+                <div class="ref-source cluster cluster--tight">
                     <div class="src-dot" style="background:${p.hex};"></div>
                     ${p.label}
                 </div>

@@ -46,20 +46,6 @@
 }
 
 /* ----------------------------------------------------------------------------
-   Panel body
-   ---------------------------------------------------------------------------- */
-
-.panel-body {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-}
-
-.panel-body--tight {
-  gap: var(--space-3xs);
-}
-
-/* ----------------------------------------------------------------------------
    Typography utilities
    ---------------------------------------------------------------------------- */
 
@@ -214,9 +200,6 @@
 }
 
 .ref-source {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3xs);
   font-size: var(--step--2);
   color: var(--text-s);
 }
@@ -233,9 +216,6 @@
    ---------------------------------------------------------------------------- */
 
 .country-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   gap: var(--space-xs);
   padding-block: var(--space-3xs);
   border-bottom: 0.5px solid var(--border);
@@ -271,9 +251,6 @@
    ---------------------------------------------------------------------------- */
 
 .confirmed-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   gap: var(--space-xs);
   padding-block: var(--space-3xs);
   border-bottom: 0.5px solid var(--border);
@@ -294,15 +271,9 @@
 .feed-row {
   padding-block: var(--space-3xs);
   border-bottom: 0.5px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3xs);
 }
 
 .feed-row__top {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
   gap: var(--space-s);
 }
 
@@ -410,3 +381,26 @@
   padding: var(--space-xs);
 }
 
+/* ----------------------------------------------------------------------------
+   Nav
+   HTML uses: <nav class="hp-nav"> / <div class="center spread"> /
+              <ul class="cluster cluster--m hp-nav__links">
+   ---------------------------------------------------------------------------- */
+
+.hp-nav {
+  padding-block: var(--space-s);
+  border-bottom: 0.5px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--bg0);
+  z-index: 10;
+}
+
+/* Typography and colour only — layout is .cluster--m in HTML */
+.hp-nav__links {
+  font-size: var(--step--1);
+  color: var(--text-t);
+  letter-spacing: 0.06em;
+}
+
+.hp-nav__links a:hover { color: var(--text-s); }

@@ -1,7 +1,7 @@
 (ns url-shortener.admin.v2.homepage
   (:require
    [hiccup2.core :as h]
-   [hiccup.page :refer [html5 doctype include-css]]
+   [hiccup.page :refer [doctype include-css]]
    [ring.util.response :refer [response content-type]]
    [url-shortener.shared.utils :refer [dev?]]
    [clojure.tools.logging :as log]))
@@ -89,14 +89,23 @@
   [:button {:class "btn btn--cta"} text])
 
 (defn btn-primary
-  ([text]            (btn-primary text nil))
-  ([text extra-class]
-   [:button {:class (cond-> "btn btn--primary"
-                      extra-class (str " " extra-class))}
-    text]))
+  ([text]                   (btn-primary text nil nil))
+  ([text extra-class]       (btn-primary text extra-class nil))
+  ([text extra-class href]
+   (let [cls (cond-> "btn btn--primary"
+               extra-class (str " " extra-class))]
+     (if href
+       [:a {:href href :class cls} text]
+       [:button {:class cls} text]))))
 
-(defn btn-ghost [text]
-  [:button {:class "btn btn--ghost"} text])
+(defn btn-ghost
+  ([text]      (btn-ghost text nil))
+  ([text href]
+   (if href
+     [:a {:href href :class "btn btn--ghost"} text]
+     [:button {:class "btn btn--ghost"} text])))
+
+
 
 ;; ---------------------------------------------------------------------------
 ;; Nav
@@ -143,7 +152,7 @@
 
       ;; CTA buttons: cluster wraps on narrow viewports
       (cluster {:variant :xs :extra-class "hero__cta-row"}
-        [(btn-primary "start tracking →")
+        [(btn-primary "start tracking →" nil "/start")
          (btn-ghost "see a live dashboard ↗")])
 
       ;; Ticker: live stats in a wrapping cluster
@@ -309,7 +318,7 @@
      (section-label "get started")
      [:h2 {:class "cta-headline"}
       "Know where your audience actually comes from."]
-     (btn-primary "create your first link →" "btn--primary-lg")
+     (btn-primary "create your first link →" "btn--primary-lg" "/start")
      [:p {:class "text-muted text-tiny"} "free to start · no credit card"]]]])
 
 ;; ---------------------------------------------------------------------------
@@ -353,14 +362,13 @@
    [:meta {:charset "UTF-8"}]
    [:meta {:name "viewport" :content "width=device-width, initial-scale=1.0"}]
    [:title "tuppu.net — link analytics with platform intelligence"]
-   (if (dev?)
-    (include-css "/css/v2/tokens.css"
-                 "/css/v2/reset.css"
-                 "/css/v2/primitives.css"
-                 "/css/v2/components.css"
-                 "/css/v2/homepage.css")
-        (include-css "/css/styles.min.css"))
-   ])
+   (if true ;(dev?)
+     (include-css "/css/v2/tokens.css"
+                  "/css/v2/reset.css"
+                  "/css/v2/primitives.css"
+                  "/css/v2/components.css"
+                  "/css/v2/homepage.css")
+     (include-css "/css/styles.min.css"))])
 
 (defn page []
   (str

@@ -103,6 +103,7 @@
   gap: var(--spread-gap, var(--space-s));
 }
 
+.spread--baseline { align-items: baseline; }
 .spread--end { align-items: flex-end; }
 
 /* ----------------------------------------------------------------------------

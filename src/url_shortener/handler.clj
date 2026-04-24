@@ -9,6 +9,7 @@
    [url-shortener.admin.v2.group-detail :as  group-v2]   
    [url-shortener.admin.v2.link-detail :as link-v2]
    [url-shortener.admin.v2.homepage :as homepage]
+   [url-shortener.admin.v2.start :as start]
    [reitit.ring :as ring]
    [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
    [muuntaja.middleware :refer [wrap-params wrap-format]]
@@ -18,6 +19,7 @@
 (defn ring-handler [{geoip :geoip redis :redis pubsub :pubsub}]
   (ring/router [["/" {:post shorten
                       :get homepage/serve}]
+                ["/start" {:get start/serve}]
                 ["/shorten" {:post shorten}]
                 ["/report"        {:post handle-create-report}]
                 ["/report/:token/stream"   {:get  (partial handle-report-stream pubsub)}]

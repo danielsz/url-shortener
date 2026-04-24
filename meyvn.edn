@@ -1,6 +1,6 @@
 {:pom {:group-id "org.danielsz",
        :artifact-id "url-shortener",
-       :version "1.4.1",
+       :version "1.4.3",
        :name "url-shortener"},
  :packaging {:uberjar {:graalvm {:enabled false,
                                  :with-https false,
@@ -22,6 +22,7 @@
                                          :css-source-exclude "**/*.min.css"
                                          :css-final-file "styles.css"
                                          :web-app-source-dir "resources/public"
+                                         :web-app-target-dir "public"
                                          :css-source-dir "css"}
                                    :images {:enabled false
                                             :png {:dirs []}

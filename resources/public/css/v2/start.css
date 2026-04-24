@@ -1,223 +1,194 @@
 /* ============================================================================
-   primitives.css — tuppu.net
-   Every Layout primitives — https://every-layout.dev (Pickering & Rennie)
-
-   Rules:
-   · No color, no typography, no component concerns here.
-   · Primitives are composable — nest them freely.
-   · Intrinsic layout only — no breakpoints, no media queries.
-   · Custom properties are the API for each primitive.
+   start.css — tuppu.net /start page
+   Depends on: tokens.css, reset.css, primitives.css, components.css
    ============================================================================ */
 
 /* ----------------------------------------------------------------------------
-   Center
-   Horizontally centres content up to --measure, with fluid inline padding.
-   Custom property: --measure (default 80rem)
-   Usage: <div class="center">
+   Card
    ---------------------------------------------------------------------------- */
 
-.center {
-  box-sizing: content-box;
-  max-inline-size: var(--measure, 80rem);
+.start-card {
+  background: var(--bg1);
+  border: 0.5px solid var(--border-s);
+  border-radius: calc(var(--radius) * 1.5);
+  padding: var(--space-m-l);
+  width: 100%;
+  max-inline-size: 44rem;
   margin-inline: auto;
-  padding-inline: var(--space-s-l);
-}
-
-/* ----------------------------------------------------------------------------
-   Stack
-   Vertical rhythm via margin-block-start on adjacent siblings.
-   Custom property: --stack-space (default --space-s)
-   Variants: .stack--2xs  → --space-2xs
-             .stack--xs   → --space-xs
-             .stack--tight → --space-3xs
-             .stack--m    → --space-m
-             .stack--loose → --space-l
-   Usage: <div class="stack">
-   ---------------------------------------------------------------------------- */
-
-.stack {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  gap: var(--space-l);
 }
 
-.stack > * + * {
-  margin-block-start: var(--stack-space, var(--space-s));
+.start-card__title {
+  font-size: var(--step-3);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
 }
 
-.stack--2xs   > * + * { --stack-space: var(--space-2xs); }
-.stack--xs    > * + * { --stack-space: var(--space-xs); }
-.stack--tight > * + * { --stack-space: var(--space-3xs); }
-.stack--m     > * + * { --stack-space: var(--space-m); }
-.stack--loose > * + * { --stack-space: var(--space-l); }
+.start-card__sub {
+  font-size: var(--step--1);
+  color: var(--text-t);
+  line-height: 1.5;
+  margin-block-start: var(--space-3xs);
+}
+
 
 /* ----------------------------------------------------------------------------
-   Box
-   A generic padded container. Colour and border added by component layer.
-   Custom property: --box-padding (default --space-s)
-   Usage: <div class="box">
+   Field
    ---------------------------------------------------------------------------- */
 
-.box {
-  padding: var(--box-padding, var(--space-s));
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
 }
 
+.field__label {
+  font-size: var(--step--2);
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--text-t);
+}
+
+.field__hint {
+  font-size: var(--step--2);
+  color: var(--text-t);
+  font-style: italic;
+}
+
+.field__input {
+  font-family: var(--mono);
+  font-size: var(--step-0);
+  color: var(--text);
+  background: var(--bg0);
+  border: 0.5px solid var(--border-s);
+  border-radius: var(--radius);
+  padding: var(--space-xs) var(--space-s);
+  width: 100%;
+  outline: none;
+  transition: border-color 0.15s;
+  appearance: none;
+}
+
+.field__input::placeholder { color: var(--text-t); }
+.field__input:focus         { border-color: var(--blue); }
+
+
 /* ----------------------------------------------------------------------------
-   Cluster
-   Horizontal group of items that wraps. Items are vertically centred.
-   Custom property: --cluster-gap (default --space-2xs)
-   Variants: .cluster--tight → --space-3xs
-             .cluster--xs    → --space-xs
-             .cluster--s     → --space-s
-             .cluster--m     → --space-m
-   Usage: <div class="cluster">
+   Platform picker
    ---------------------------------------------------------------------------- */
 
-.cluster {
+.platform-picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+}
+
+.platform-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--cluster-gap, var(--space-2xs));
-  align-items: center;
+  gap: var(--space-2xs);
 }
 
-.cluster--tight { --cluster-gap: var(--space-3xs); }
-.cluster--xs    { --cluster-gap: var(--space-xs); }
-.cluster--s     { --cluster-gap: var(--space-s); }
-.cluster--m     { --cluster-gap: var(--space-m); }
+/* Chip — label wrapping a hidden checkbox.
+   Selected state driven by :has(input:checked); no JS required. */
+
+.plat-chip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3xs);
+  padding: var(--space-3xs) var(--space-xs);
+  border: 0.5px solid var(--border-s);
+  border-radius: var(--radius);
+  background: var(--bg0);
+  font-size: var(--step--1);
+  color: var(--text-s);
+  cursor: pointer;
+  user-select: none;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.plat-chip:hover {
+  background: var(--bg2);
+}
+
+.plat-chip:has(input:checked) {
+  background: var(--bg1);
+  color: var(--text);
+  border-color: var(--chip-color, var(--text-s));
+  box-shadow: inset 0 0 0 0.5px var(--chip-color, var(--text-s));
+}
+
+.plat-chip input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.plat-chip__dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 1px;
+  flex-shrink: 0;
+  background: var(--chip-color, var(--text-t));
+  opacity: 0.5;
+  transition: opacity 0.15s;
+}
+
+.plat-chip:has(input:checked) .plat-chip__dot {
+  opacity: 1;
+}
+
+.plat-chip__name { letter-spacing: 0.03em; }
+
 
 /* ----------------------------------------------------------------------------
-   Spread
-   A row where items are pushed to opposite ends (space-between).
-   Wraps gracefully. Use when two groups need to occupy opposite sides.
-   Custom property: --spread-gap (default --space-s)
-   Variants: .spread--end → aligns items to flex-end (e.g. preview header)
-   Usage: <div class="spread">
+   Custom target row — plain .field column; only the input sizing is overridden
    ---------------------------------------------------------------------------- */
 
-.spread {
+.custom-target-row .field__input {
+  font-size: var(--step--1);
+  padding: var(--space-3xs) var(--space-xs);
+}
+
+
+/* ----------------------------------------------------------------------------
+   Submit row
+   ---------------------------------------------------------------------------- */
+
+.submit-row {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  gap: var(--spread-gap, var(--space-s));
-}
-
-.spread--end { align-items: flex-end; }
-
-/* ----------------------------------------------------------------------------
-   Switcher
-   A row that collapses into a column below --switcher-threshold.
-   Children grow equally. No breakpoint needed.
-   Custom property: --switcher-threshold (default 30rem)
-                    --switcher-gap       (default --space-s)
-   Variants: .switcher--stat → tight threshold for stat groups
-   Usage: <div class="switcher">
-   ---------------------------------------------------------------------------- */
-
-.switcher {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--switcher-gap, var(--space-s));
-}
-
-.switcher > * {
-  flex-grow: 1;
-  flex-basis: calc((var(--switcher-threshold, 30rem) - 100%) * 999);
-}
-
-.switcher--stat {
-  --switcher-threshold: 10rem;
-  --switcher-gap: var(--space-xs);
-}
-
-/* ----------------------------------------------------------------------------
-   Sidebar (Every Layout sidebar pattern)
-   A two-column layout that collapses when the side can't hold --sidebar-basis.
-   Uses row-reverse so the sidebar is second in DOM but first visually.
-   Custom property: --sidebar-basis (default 300px)
-   Usage:
-     <div class="sidebar-layout">
-       <main class="sidebar-layout__main">…</main>
-       <aside class="sidebar-layout__side">…</aside>
-     </div>
-   ---------------------------------------------------------------------------- */
-
-.sidebar-layout {
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: row-reverse;
   gap: var(--space-s);
-  align-items: start;
+  padding-block-start: var(--space-s);
+  border-top: 0.5px solid var(--border);
 }
 
-.sidebar-layout__main {
-  flex-basis: 0;
-  flex-grow: 999;
-  min-inline-size: min(60%, 100%);
+.submit-row__note {
+  font-size: var(--step--2);
+  color: var(--text-t);
+  line-height: 1.5;
 }
 
-.sidebar-layout__side {
-  flex-basis: var(--sidebar-basis, 300px);
-  flex-grow: 1;
+.btn--submit {
+  font-family: var(--mono);
+  font-size: var(--step-0);
+  letter-spacing: 0.06em;
+  background: var(--text);
+  color: var(--bg0);
+  border: none;
+  padding: var(--space-xs) var(--space-m);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: opacity 0.2s;
+  white-space: nowrap;
 }
 
-.sidebar-layout__main,
-.sidebar-layout__side {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-s);
-}
-
-/* ----------------------------------------------------------------------------
-   Cover
-   Vertically centres a principal child, with optional header/footer.
-   Custom property: --cover-min-height (default 100dvh)
-   Usage:
-     <div class="cover">
-       <header>…</header>
-       <main class="cover__principal">…</main>
-     </div>
-   ---------------------------------------------------------------------------- */
-
-.cover {
-  display: flex;
-  flex-direction: column;
-  min-block-size: var(--cover-min-height, 100dvh);
-  padding: var(--space-s);
-}
-
-.cover__principal {
-  margin-block: auto;
-}
-
-/* ----------------------------------------------------------------------------
-   Grid (auto-fit intrinsic grid)
-   Items fill the row; when they can't fit --grid-min-size, they wrap.
-   Custom property: --grid-min-size (default 16rem)
-                    --grid-gap      (default --space-s)
-   Usage: <ul class="grid">
-   ---------------------------------------------------------------------------- */
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(var(--grid-min-size, 16rem), 100%), 1fr));
-  gap: var(--grid-gap, var(--space-s));
-}
-
-/* ----------------------------------------------------------------------------
-   Reel
-   Horizontal scroll container.
-   Usage: <div class="reel">
-   ---------------------------------------------------------------------------- */
-
-.reel {
-  display: flex;
-  gap: var(--space-s);
-  overflow-x: auto;
-  scrollbar-width: thin;
-}
-
-.reel > * {
-  flex-shrink: 0;
-}
+.btn--submit:hover { opacity: 0.8; }
 
