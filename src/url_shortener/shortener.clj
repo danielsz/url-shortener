@@ -1,6 +1,7 @@
 (ns url-shortener.shortener
   (:require [taoensso.carmine :as redis]
             [clojure.core.async :as a]
+            [clojure.string :as str]
             [clojure.tools.logging :as log]
             [url-shortener.shared.utils :refer [hash-url url-validator epoch-now]]
             [url-shortener.schema :refer [owner-key group-links-key default-group-id group-key owner-groups-key targets-key]]
@@ -13,15 +14,18 @@
     (let [path     (hash-url url)
           group-id (if group-id
                      (str owner-id ":" group-id)
-                     (default-group-id owner-id))]
+                     (default-group-id owner-id))
+          targets  (->> (if (sequential? target) target [target])
+                        (remove str/blank?)
+                        set)]
       (redis/wcar nil
         (redis/hset   path "url"         url
                            "owner-id"    owner-id
                            "group-id"    group-id
                            "description" description)
         (redis/hsetnx path "clicks" 0)
-        (when (seq target)
-          (redis/sadd (targets-key path) target))
+        (when (seq targets)
+          (redis/sadd (targets-key path) targets))
         (redis/hsetnx (group-key group-id) "owner-id" owner-id)
         (redis/hsetnx (group-key group-id) "created"  (epoch-now))
         (redis/sadd   (owner-groups-key owner-id) group-id)
