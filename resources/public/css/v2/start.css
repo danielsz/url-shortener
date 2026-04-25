@@ -192,3 +192,17 @@
 
 .btn--submit:hover { opacity: 0.8; }
 
+.btn--copy {
+  font-family: var(--mono);
+  font-size: var(--step--2);
+  letter-spacing: 0.08em;
+  color: var(--text-t);
+  background: var(--bg2);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-3xs) var(--space-xs);
+  cursor: pointer;
+  align-self: flex-start;
+  transition: color 0.15s;
+}
+.btn--copy:hover { color: var(--text); }

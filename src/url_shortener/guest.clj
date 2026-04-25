@@ -31,11 +31,12 @@
 ;; Post-shorten page
 ;; ---------------------------------------------------------------------------
 
-(defn- copy-button [target-id]
-  [:button {:class    "btn--copy"
-            :onclick  (str "navigator.clipboard.writeText(document.getElementById('" target-id "').textContent);"
-                           "this.textContent='copied!';"
-                           "setTimeout(()=>this.textContent='copy',1500)")}
+(defn copy-button [target-id]
+  [:button {:class   "btn--copy"
+            :onclick (str "navigator.clipboard.writeText(document.getElementById('"
+                          target-id "').value);"
+                          "this.textContent='copied!';"
+                          "setTimeout(()=>this.textContent='copy',1500)")}
    "copy"])
 
 (defn- post-shorten-page [short-url report-url path]
@@ -54,41 +55,46 @@
                      "/css/v2/start.css")]
        [:body {:class "start-page cover"}
         (start-page/nav)
-        [:main {:class "cover__principal center"}
-         [:div {:class "start-card"}
-          [:div {:class "start-card__header"}
-           [:h1 {:class "start-card__title"} "Your link is ready."]
-           [:p  {:class "start-card__sub"}
-            "Share it anywhere. Your analytics dashboard updates live as clicks arrive."]]
+        [:main {:class "cover__principal"}
+         [:div.center 
+          [:div {:class "start-card"}
+           [:div {:class "start-card__header"}
+            [:h1 {:class "start-card__title"} "Your link is ready."]
+            [:p  {:class "start-card__sub"}
+             "Share it anywhere. Your analytics dashboard updates live as clicks arrive."]]
 
-          [:div {:class "stack"}
+           [:div {:class "stack"}
 
-           ;; Short URL
-           [:div {:class "field"}
-            [:span {:class "field__label"} "your short link"]
-            [:div {:class "cluster cluster--tight"}
-             [:code {:class "field__input field__input--display" :id "short-url"} short-url]
-             (copy-button "short-url")]]
-
-           ;; Report URL
-           [:div {:class "field"}
-            [:span {:class "field__label"} "analytics dashboard"]
-            [:div {:class "cluster cluster--tight"}
-             [:code {:class "field__input field__input--display" :id "report-url"} report-url]
-             (copy-button "report-url")]
-            [:p {:class "field__hint"}
-             "Public — share it with anyone. Temporary — save it before it expires."]]
-
-           ;; CTA
-           [:div {:class "field"}
-            [:span {:class "field__label"} "save permanently"]
-            [:p {:class "field__hint"}
-             "Sign up to keep your link and dashboard forever."]
-            [:div {:class "cluster cluster--xs"}
-             [:a {:href  (str "/register?claim=" path)
-                  :class "btn btn--primary"} "sign up →"]
-             [:a {:href  (str "/login?claim=" path)
-                  :class "btn btn--ghost"} "sign in"]]]]]]]])))
+            [:div {:class "field"}
+             [:span {:class "field__label"} "your short link"]             
+             [:input {:class    "field__input"
+                      :id       "short-url"
+                      :type     "text"
+                      :value    short-url
+                      :readonly true}]]
+            (copy-button "short-url")
+            
+            [:div {:class "field"}
+             [:span {:class "field__label"} "analytics dashboard"]
+             [:input {:class    "field__input"
+                      :id       "report-url"
+                      :type     "text"
+                      :value    report-url
+                      :readonly true}]
+             (copy-button "report-url")
+             [:p {:class "field__hint"}
+              "Public — share it with anyone. Temporary — save it before it expires."]]
+            
+            ;; CTA
+            [:div {:class "field"}
+             [:span {:class "field__label"} "save permanently"]
+             [:p {:class "field__hint"}
+              "Sign up to keep your link and dashboard forever."]
+             [:div {:class "cluster cluster--xs"}
+              [:a {:href  (str "/register?claim=" path)
+                   :class "btn btn--primary"} "sign up →"]
+              [:a {:href  (str "/login?claim=" path)
+                   :class "btn btn--ghost"} "sign in"]]]]]]]]])))
 
 ;; ---------------------------------------------------------------------------
 ;; Handlers

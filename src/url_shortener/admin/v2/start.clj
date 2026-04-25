@@ -133,16 +133,17 @@
       [:body {:class "start-page cover"}
        (nav)
        [:main {:class "cover__principal center"}
-        [:a {:href "/" :class "start-back"} "← back"]
-        [:div {:class "start-card"}
-         [:div {:class "start-card__header"}
-          [:h1 {:class "start-card__title"} "Shorten a link."]
-          [:p  {:class "start-card__sub"}
-           "Tell us where you're posting — we'll track which platform "
-           "actually drives clicks."]]
-         [:form {:method "post" :action "/start" :id "start-form"}
-          (url-field)
-          (platform-picker)
-          (submit-row)]]]]])))
+        [:div
+         [:a {:href "/" :class "start-back"} "← back"]
+         [:div {:class "start-card"}
+          [:div {:class "start-card__header"}
+           [:h1 {:class "start-card__title"} "Shorten a link."]
+           [:p  {:class "start-card__sub"}
+            "Tell us where you're posting — we'll track which platform "
+            "actually drives clicks."]]
+          [:form {:method "post" :action "/start" :id "start-form"}
+           (url-field)
+           (platform-picker)
+           (submit-row)]]]]]])))
 
 

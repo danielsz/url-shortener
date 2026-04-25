@@ -71,10 +71,16 @@
            [:div.stack.stack--xs {:id "confirmed-panel"}]]]
 
          [:div.sidebar-layout__main
-          [:div.pnl.stack {:id "ts-panel" :hidden true}
+          [:div.pnl.stack.pnl--conditional
+           {:id        "ts-panel"
+            :data-show (str "(() => {"
+                            "const all = ($daily && $daily.all) ? $daily.all : {};"
+                            "const active = Object.values(all).filter(v => v > 0);"
+                            "return active.length >= 3 && active.reduce((a,b) => a+b, 0) >= 10;"
+                            "})()")}
            [:div.pnl-title "Clicks over time — daily"]
            [:div.chart-wrap
-            [:canvas {:id "tsChart"}]]]
+            [:canvas {:id "tsChart"}]]]          
           [:div.pnl.stack.pnl--conditional
            {:id        "feed-pnl"
             :data-show "$feed && $feed.length > 0"}
@@ -140,7 +146,13 @@
            [:div.stack.stack--xs {:id "confirmed-panel"}]]]
 
          [:div.sidebar-layout__main
-          [:div.pnl.stack {:id "ts-panel" :hidden true}
+          [:div.pnl.stack.pnl--conditional
+           {:id        "ts-panel"
+            :data-show (str "(() => {"
+                            "const all = ($daily && $daily.all) ? $daily.all : {};"
+                            "const active = Object.values(all).filter(v => v > 0);"
+                            "return active.length >= 3 && active.reduce((a,b) => a+b, 0) >= 10;"
+                            "})()")}
            [:div.pnl-title "Clicks over time — daily"]
            [:div.chart-wrap
             [:canvas {:id "tsChart"}]]]
