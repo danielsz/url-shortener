@@ -2,7 +2,8 @@
   (:require
    [url-shortener.shortener :refer [shorten handle-redirect handle-redirect-with-legacy]]
    [url-shortener.report :refer [handle-report-page handle-create-report  handle-report-stream]]
-   [url-shortener.reports.api :refer [handle-api-report]]   
+   [url-shortener.guest :refer [handle-shorten handle-start]]
+   [url-shortener.reports.api :refer [handle-api-report]]
    [url-shortener.admin.v1.handler :as handler-v1]
    [url-shortener.admin.v1.link-detail :as link-v1]
    [url-shortener.admin.v1.group-detail :as group-v1]
@@ -12,6 +13,7 @@
    [url-shortener.admin.v2.start :as start]
    [reitit.ring :as ring]
    [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
+   [ring.middleware.cookies :refer [wrap-cookies]]
    [muuntaja.middleware :refer [wrap-params wrap-format]]
    [ring.middleware.proxy-headers :refer [wrap-forwarded-remote-addr]]
    [clojure.tools.logging :as log]))
@@ -19,7 +21,8 @@
 (defn ring-handler [{geoip :geoip redis :redis pubsub :pubsub}]
   (ring/router [["/" {:post shorten
                       :get homepage/serve}]
-                ["/start" {:get start/serve}]
+                ["/start" {:get handle-start
+                           :post handle-shorten}]
                 ["/shorten" {:post shorten}]
                 ["/report"        {:post handle-create-report}]
                 ["/report/:token/stream"   {:get  (partial handle-report-stream pubsub)}]
@@ -45,4 +48,5 @@
 (def middleware [[wrap-defaults api-defaults]
                  wrap-format
                  wrap-params
+                 wrap-cookies
                  wrap-forwarded-remote-addr])

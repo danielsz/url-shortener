@@ -39,6 +39,7 @@
 
 (def TTL-REPORT    (* 14 86400))
 (def TTL-ANALYTICS (* 90 86400))
+(def TTL-GUEST-ANALYTICS (* 24 3600))
 
 ;; -- Link key helpers ---------------------------------------------------------
 
@@ -87,5 +88,3 @@
 ;; -- Default group ------------------------------------------------------------
 
 (defn default-group-id [owner-id] (str "default:" owner-id))
-
-

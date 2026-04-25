@@ -133,19 +133,16 @@
       [:body {:class "start-page cover"}
        (nav)
        [:main {:class "cover__principal center"}
-        [:div {:class "center" :style "width:100%"}
-         [:a {:href "/" :class "start-back"} "← back"]
-         [:div {:class "start-card"}
-          [:div {:class "start-card__header"}
-           [:h1 {:class "start-card__title"} "Shorten a link."]
-           [:p  {:class "start-card__sub"}
-            "Tell us where you're posting — we'll track which platform "
-            "actually drives clicks."]]
-          [:form {:method "post" :action "/shorten" :id "start-form"}
-           (url-field)
-           (platform-picker)
-           (submit-row)]]]]]])))
+        [:a {:href "/" :class "start-back"} "← back"]
+        [:div {:class "start-card"}
+         [:div {:class "start-card__header"}
+          [:h1 {:class "start-card__title"} "Shorten a link."]
+          [:p  {:class "start-card__sub"}
+           "Tell us where you're posting — we'll track which platform "
+           "actually drives clicks."]]
+         [:form {:method "post" :action "/start" :id "start-form"}
+          (url-field)
+          (platform-picker)
+          (submit-row)]]]]])))
 
-(defn serve [_]
-  (-> (response (page))
-     (content-type "text/html")))
+

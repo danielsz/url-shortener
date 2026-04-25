@@ -13,8 +13,11 @@
 (def ip-validator  (InetAddressValidator/getInstance))
 (def url-validator (UrlValidator. (into-array ["http" "https"])))
 
-(def hash-url (comp (partial format "%x")
-                 #(Murmur3/hashUnencodedChars %)))
+(defn hash-url
+  ([s]
+   (format "%x" (Murmur3/hashUnencodedChars s)))
+  ([url owner-id]
+    (hash-url (str url owner-id))))
 
 (defn resolve-report [token]
   (let [r (redis/wcar nil (redis/hgetall (report-key token)))]
@@ -68,3 +71,5 @@
     (= (Integer. port) 8088)
     false))
 
+(defn guest? [owner-id]
+  (str/starts-with? owner-id "anon:"))
