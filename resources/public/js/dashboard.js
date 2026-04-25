@@ -23,6 +23,18 @@ const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
 const tickColor = isDark ? 'rgba(200,200,200,0.45)' : 'rgba(60,60,60,0.45)';
 
 // ---------------------------------------------------------------------------
+// Daily data guard
+// ---------------------------------------------------------------------------
+
+
+function hasEnoughDailyData(daily) {
+    const all = daily?.all ?? {};
+    const activeDays = Object.values(all).filter(v => v > 0);
+    return activeDays.length >= 3 && activeDays.reduce((a, b) => a + b, 0) >= 10;
+}
+
+
+// ---------------------------------------------------------------------------
 // Signal accumulator — merges RFC 7386 patches into full local state
 // ---------------------------------------------------------------------------
 
@@ -235,7 +247,13 @@ document.addEventListener('datastar-signal-patch', (e) => {
     const patch = e.detail || {};
     currentSignals = mergeDeep(currentSignals, patch);
     const sig = currentSignals;
-    if (patch.daily)                   updateChart(sig.daily);
+    if (patch.daily) {
+	const enough = hasEnoughDailyData(sig.daily);
+	const panel  = document.getElementById('ts-panel');
+	if (panel) panel.hidden = !enough;
+	if (enough) updateChart(sig.daily);
+    }
+
     if (patch.links)                   renderLinks(sig.links);
     if (patch.countries)               renderCountries(sig.countries);
     if (patch.platforms)               renderPlatforms(sig.platforms);

@@ -71,7 +71,7 @@
            [:div.stack.stack--xs {:id "confirmed-panel"}]]]
 
          [:div.sidebar-layout__main
-          [:div.pnl.stack
+          [:div.pnl.stack {:id "ts-panel" :hidden true}
            [:div.pnl-title "Clicks over time — daily"]
            [:div.chart-wrap
             [:canvas {:id "tsChart"}]]]
@@ -86,7 +86,7 @@
 
         (when back-link
           [:div.back-link [:a {:href (second back-link)} (first back-link)]])]]]
-     [:script {:src "/js/group-dashboard.js"}]]))
+     [:script {:src "/js/dashboard.js"}]]))
 
 (defn link-dashboard-page [path url description stream-url back-link]
   (html5
@@ -140,7 +140,7 @@
            [:div.stack.stack--xs {:id "confirmed-panel"}]]]
 
          [:div.sidebar-layout__main
-          [:div.pnl.stack
+          [:div.pnl.stack {:id "ts-panel" :hidden true}
            [:div.pnl-title "Clicks over time — daily"]
            [:div.chart-wrap
             [:canvas {:id "tsChart"}]]]
@@ -158,7 +158,7 @@
 
         (when back-link
           [:div.back-link [:a {:href (second back-link)} (first back-link)]])]]]
-     [:script {:src "/js/group-dashboard.js"}]]))
+     [:script {:src "/js/dashboard.js"}]]))
 
 
 

@@ -41,17 +41,19 @@
      Type scale — minor third, fluid
      -------------------------------------------------------------------------- */
 
-  --step--2: clamp(0.56rem, 0.54rem + 0.11vw, 0.63rem);
-  --step--1: clamp(0.69rem, 0.65rem + 0.22vw, 0.81rem);
-  --step-0:  clamp(0.88rem, 0.80rem + 0.37vw, 1.06rem);
-  --step-1:  clamp(1.06rem, 0.96rem + 0.54vw, 1.31rem);
-  --step-2:  clamp(1.31rem, 1.14rem + 0.87vw, 1.69rem);
-  --step-3:  clamp(1.63rem, 1.35rem + 1.41vw, 2.19rem);
-  --step-4:  clamp(2.00rem, 1.59rem + 2.07vw, 2.75rem);
-  --step-5:  clamp(2.50rem, 1.89rem + 3.04vw, 3.50rem);
-  --step-6:  clamp(3.00rem, 2.26rem + 3.70vw, 4.50rem);
-  --step-7:  clamp(3.50rem, 2.54rem + 4.78vw, 6.00rem);
+/* @link https://utopia.fyi/type/calculator?c=360,18,1.2,1240,20,1.25,7,2,&s=0.75|0.5|0.25,1.5|2|3|4|6,s-l&g=s,l,xl,12 */
 
+  --step--2: clamp(0.7813rem, 0.7736rem + 0.0341vw, 0.8rem);
+  --step--1: clamp(0.9375rem, 0.9119rem + 0.1136vw, 1rem);
+  --step-0: clamp(1.125rem, 1.0739rem + 0.2273vw, 1.25rem);
+  --step-1: clamp(1.35rem, 1.2631rem + 0.3864vw, 1.5625rem);
+  --step-2: clamp(1.62rem, 1.4837rem + 0.6057vw, 1.9531rem);
+  --step-3: clamp(1.944rem, 1.7405rem + 0.9044vw, 2.4414rem);
+  --step-4: clamp(2.3328rem, 2.0387rem + 1.3072vw, 3.0518rem);
+  --step-5: clamp(2.7994rem, 2.384rem + 1.8461vw, 3.8147rem);
+  --step-6: clamp(3.3592rem, 2.7828rem + 2.5621vw, 4.7684rem);
+  --step-7: clamp(4.0311rem, 3.2418rem + 3.508vw, 5.9605rem);
+  
   /* --------------------------------------------------------------------------
      Measure — max line length for prose
      -------------------------------------------------------------------------- */
