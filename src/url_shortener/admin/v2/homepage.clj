@@ -119,8 +119,8 @@
        "tuppu" [:span {:class "wordmark__dot"} ".net"]]
       ;; nav links are themselves a cluster
       (cluster {:variant :m :extra-class "hp-nav__links" :tag :ul}
-        [[:li [:a {:href "#"} "docs"]]
-         [:li [:a {:href "#"} "pricing"]]
+        [[:li [:a {:href "/docs"} "docs"]]
+         [:li [:a {:href "/pricing"} "pricing"]]
          [:li (btn-cta "sign in →")]])])])
 
 ;; ---------------------------------------------------------------------------
@@ -332,10 +332,10 @@
      [[:span {:class "wordmark"}
        "tuppu" [:span {:class "wordmark__dot"} ".net"]]
       (cluster {:variant :m :extra-class "hp-footer__links" :tag :ul}
-        [[:li [:a {:href "#"} "privacy"]]
-         [:li [:a {:href "#"} "terms"]]
-         [:li [:a {:href "#"} "api"]]
-         [:li [:a {:href "#"} "status"]]])
+        [[:li [:a {:href "/coming-soon"} "privacy"]]
+         [:li [:a {:href "/coming-soon"} "terms"]]
+         [:li [:a {:href "/coming-soon"} "api"]]
+         [:li [:a {:href "/coming-soon"} "status"]]])
       [:span "Q = quantitative · O = ordinal · N = nominal"]])])
 
 ;; ---------------------------------------------------------------------------
