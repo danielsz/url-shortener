@@ -3,7 +3,12 @@
    [hiccup2.core :as h]
    [hiccup.page :refer [doctype include-css]]
    [ring.util.response :refer [response content-type]]
+   [starfederation.datastar.clojure.api :as d*]
+   [starfederation.datastar.clojure.adapter.http-kit :refer [->sse-response on-open on-close]]
+   [url-shortener.shared.analytics :as analytics]
    [url-shortener.shared.utils :refer [dev?]]
+   [clojure.core.async :as async]
+   [cheshire.core :as json]
    [clojure.tools.logging :as log]))
 
 
@@ -80,7 +85,7 @@
 ;; ---------------------------------------------------------------------------
 
 (defn live-dot []
-  [:span {:class "live-dot live-dot--blue"}])
+  [:span {:class "live-dot live-dot--blue" :data-class "{active: $connected}"}])
 
 (defn section-label [text]
   [:p {:class "section-label"} text])
@@ -121,18 +126,12 @@
       (cluster {:variant :m :extra-class "hp-nav__links" :tag :ul}
         [[:li [:a {:href "/docs"} "docs"]]
          [:li [:a {:href "/pricing"} "pricing"]]
-         [:li (btn-cta "sign in →")]])])])
+         [:li [:a {:href "/register" :role "button" :class "btn btn--cta"} "sign in →"]]])])])
 
 ;; ---------------------------------------------------------------------------
 ;; Hero
 ;; ---------------------------------------------------------------------------
 
-(defn ticker-stat
-  ([value label]    (ticker-stat value label nil))
-  ([value label id]
-   [:span {:class "ticker-stat"}
-    [:strong (if id {:id id} {}) value]
-    " " label]))
 
 (defn hero []
   [:section {:class "hero"}
@@ -157,10 +156,10 @@
 
       ;; Ticker: live stats in a wrapping cluster
       (cluster {:variant :m :extra-class "hero__ticker"}
-        [(ticker-stat "4,984" "clicks today" "click-count")
-         (ticker-stat "239"   "active links")
-         (ticker-stat "1,081" "unique visitors")
-         (ticker-stat "8"     "platforms tracked")])])])
+               [[:span {:class "ticker-stat"}  [:strong {:data-text "$total_clicks.toLocaleString()"} "--"] " " "clicks"]
+                [:span {:class "ticker-stat"} [:strong {:data-text "$links.toLocaleString()"} "--"] " " "active links"]
+                [:span {:class "ticker-stat"} [:strong {:data-text "$unique_visitors.toLocaleString()"} "--"] " " "unique visitors"]              
+                [:span {:class "ticker-stat"} [:strong {:data-text "$groups.toLocaleString()"} "--"] " " "groups"]])])])
 
 ;; ---------------------------------------------------------------------------
 ;; How it works
@@ -249,8 +248,8 @@
           ;; .dash-title-row overrides .spread's align-items to :baseline
           (spread {:extra-class "dash-title-row"}
             [(stack {:variant :tight}
-               [[:div {:class "dash-total"} "4,984"]
-                [:div {:class "dash-label"} "total clicks"]])
+                    [[:div {:class "dash-total" :data-text "$total_clicks.toLocaleString()"}]
+                     [:div {:class "dash-label"} "total clicks"]])
              ;; live badge: dot + text
              (cluster {:variant :tight :extra-class "dash-live"}
                [(live-dot)
@@ -259,14 +258,15 @@
           ;; sub-stats: three stat cells in a wrapping cluster
           (cluster {:variant :s}
             [(stack {:variant :tight :extra-class "dash-stat"}
-               [[:span {:class "dash-stat__val"} "1,081"]
+               [[:span {:class "dash-stat__val" :data-text "$unique_visitors.toLocaleString()"}]
                 [:span {:class "dash-stat__lbl"} "visitors"]])
              (stack {:variant :tight :extra-class "dash-stat"}
-               [[:span {:class "dash-stat__val"} "239"]
-                [:span {:class "dash-stat__lbl"} "links"]])
+                    [[:span {:class "dash-stat__val" :data-text "$links.toLocaleString()"}]
+                     [:span {:class "dash-stat__lbl"} "links"]])
              (stack {:variant :tight :extra-class "dash-stat"}
-               [[:span {:class "dash-stat__val"} "4.6×"]
-                [:span {:class "dash-stat__lbl"} "clicks / visitor"]])])
+                    [[:span {:class "dash-stat__val"
+                             :data-text "($unique_visitors > 0 ? ($total_clicks / $unique_visitors).toFixed(1) : '—') + '×'"}]
+                     [:span {:class "dash-stat__lbl"} "clicks / visitor"]])])
 
           ;; platform breakdown: tight stack of rows
           (stack {:variant :tight}
@@ -338,20 +338,6 @@
          [:li [:a {:href "/coming-soon"} "status"]]])
       [:span "Q = quantitative · O = ordinal · N = nominal"]])])
 
-;; ---------------------------------------------------------------------------
-;; Scripts
-;; ---------------------------------------------------------------------------
-
-(defn ticker-script []
-  [:script
-   (h/raw
-    "var el=document.getElementById('click-count'),n=4984;
-     setInterval(function(){
-       if(Math.random()<0.3){
-         n+=Math.floor(Math.random()*3)+1;
-         el.textContent=n.toLocaleString();
-       }
-     },2800);")])
 
 ;; ---------------------------------------------------------------------------
 ;; Page
@@ -368,7 +354,9 @@
                   "/css/v2/primitives.css"
                   "/css/v2/components.css"
                   "/css/v2/homepage.css")
-     (include-css "/css/styles.min.css"))])
+     (include-css "/css/styles.min.css"))
+   [:script {:type "module"
+             :src  "https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.8/bundles/datastar.js"}]])
 
 (defn page []
   (str
@@ -376,19 +364,46 @@
      (doctype :html5)
      [:html {:lang "en"}
       (head)
-      [:body
+      [:body {:data-signals "{total_clicks:0,unique_visitors:0,links:0,groups:0}"
+              :data-on:datastar-fetch "el === evt.detail.el && ((evt.detail.type.startsWith('datastar') && ($connected = true)) || (['retrying', 'error', 'finished'].includes(evt.detail.type) && ($connected = false)))"
+              :data-init    "@get('/stream')"}
        (nav)
        (hero)
        (how-it-works)
        (dashboard-preview)
        (features)
        (cta)
-       (footer)
-       (ticker-script)]])))
+       (footer)]])))
+
+
+(defn handle-homepage-stream [pubsub request]
+  (let [ch-atom  (atom nil)
+        cleanup! (fn []
+                   (when-let [ch @ch-atom]
+                     (async/unsub (:publication pubsub) :analytics-update ch)
+                     (async/close! ch)
+                     (reset! ch-atom nil)))]
+    (->sse-response request
+      {on-open
+       (fn [sse]
+         (let [ch (async/chan (async/sliding-buffer 10))]
+           (reset! ch-atom ch)
+           (async/sub (:publication pubsub) :analytics-update ch)
+           (try
+             (d*/patch-signals! sse (json/generate-string (analytics/global-stats)))
+             (loop []
+               (when-let [_ (async/<!! ch)]
+                 (try
+                   (d*/patch-signals! sse (json/generate-string (analytics/global-stats)))
+                   (catch Exception e (log/error "homepage push failed" (.getMessage e))))
+                 (recur)))
+             (catch Exception e (log/error "homepage stream failed" (.getMessage e))))))
+       on-close
+       (fn [sse status]
+         (log/debug "homepage stream closed" status)
+         (cleanup!))})))
+
 
 (defn serve [_]
   (-> (response (page))
      (content-type "text/html")))
-
-
-

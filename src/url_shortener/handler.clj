@@ -9,7 +9,7 @@
    [url-shortener.admin.v1.group-detail :as group-v1]
    [url-shortener.admin.v2.group-detail :as  group-v2]   
    [url-shortener.admin.v2.link-detail :as link-v2]
-   [url-shortener.admin.v2.homepage :as homepage]
+   [url-shortener.admin.v2.homepage :as homepage]   
    [url-shortener.admin.v2.start :as start]
    [url-shortener.admin.v2.coming-soon :as coming-soon]
    [reitit.ring :as ring]
@@ -25,6 +25,7 @@
                 ["/start" {:get handle-start
                            :post handle-shorten}]
                 ["/shorten" {:post shorten}]
+                ["/stream" {:get (partial homepage/handle-homepage-stream pubsub)}]
                 ["/report"        {:post handle-create-report}]
                 ["/report/:token/stream"   {:get  (partial handle-report-stream pubsub)}]
                 ["/report/:token"          {:get  handle-report-page}]

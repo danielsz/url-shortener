@@ -18,6 +18,12 @@
   color: var(--blue);
 }
 
+.wordmark svg {
+  height: var(--step-4);
+  width: auto;
+  display: block;
+}
+
 /* ----------------------------------------------------------------------------
    Panel
    Raised surface. Compose with .stack, .box, .cluster from primitives.

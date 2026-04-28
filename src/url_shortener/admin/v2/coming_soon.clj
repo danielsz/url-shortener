@@ -2,6 +2,7 @@
   (:require
    [hiccup2.core :as h]
    [hiccup.page :refer [doctype include-css]]
+   [url-shortener.shared.components :refer [logo]]
    [ring.util.response :refer [response content-type]]))
 
 ;; ============================================================================
@@ -23,9 +24,8 @@
 (defn- nav []
   [:nav {:class "hp-nav"}
    [:div {:class "spread center"}
-    [:a {:href "/" :class "wordmark"}
-     "tuppu" [:span {:class "wordmark__dot"} ".net"]]]])
-
+    [:a {:href "/" :class "wordmark" :aria-label "tuppu.net"}
+     logo]]])
 
 ;; ---------------------------------------------------------------------------
 ;; Page
@@ -67,7 +67,7 @@
            [:a {:href   "https://discord.gg/ARYDmB2BZ"   ; ← replace with real invite
                 :class  "btn--submit"
                 :style  "display:inline-block; text-align:center;"}
-            "find us on Discord →"]
+            "Find us on Discord →"]
            [:p {:class "field__hint"}
             "look for the #tuppu channel"]]
 
