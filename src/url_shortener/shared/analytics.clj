@@ -108,18 +108,27 @@
 ;; ---------------------------------------------------------------------------
 
 (defn global-stats []
-  (let [group-ids   (redis/wcar nil (redis/smembers "all-groups"))
-        total-links (redis/wcar nil (redis/scard "all-links"))
-        results     (redis/wcar nil
-                      (doseq [g group-ids]
-                        (redis/hget  (group-key g) "clicks")
-                        (redis/zcard (group-ips-key g))))
-        clicks      (->> results (take-nth 2) (map #(parse-long (or % "0"))))
-        unique-ips  (->> results (drop 1) (take-nth 2) (map #(or % 0)))]
+  (let [group-ids    (redis/wcar nil (redis/smembers "all-groups"))
+        total-links  (redis/wcar nil (redis/scard "all-links"))
+        results      (redis/wcar nil
+                       (doseq [g group-ids]
+                         (redis/hget    (group-key g) "clicks")
+                         (redis/zcard   (group-ips-key g))
+                         (redis/hgetall (group-platforms-key g))))
+        clicks       (->> results (take-nth 3) (map #(parse-long (or % "0"))))
+        unique-ips   (->> results (drop 1) (take-nth 3) (map #(or % 0)))
+        platforms    (->> results
+                          (drop 2)
+                          (take-nth 3)
+                          (map #(parse-counts %))
+                          (reduce (fn [acc m] (merge-with + acc m)) {})
+                          (sort-by val >)
+                          (into {}))]
     {:total_clicks    (apply + clicks)
      :unique_visitors (apply + unique-ips)
      :groups          (count group-ids)
-     :links           (or total-links 0)}))
+     :links           (or total-links 0)
+     :platforms       platforms}))
 
 (defn global-groups []
   (->> (redis/wcar nil (redis/smembers "all-groups"))

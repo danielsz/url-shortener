@@ -207,22 +207,24 @@
 ;; Dashboard preview
 ;; ---------------------------------------------------------------------------
 
-(defn platform-row [{:keys [name color width count]}]
-  [:div {:class "platform-row"}
-   ;; .plat-name inherits layout from dashboard.css grid column
-   (cluster {:variant :tight :extra-class "plat-name"}
-     [[:span {:class "plat-dot" :style (str "background:" color)}]
-      name])
-   [:div {:class "plat-bar-track"}
-    [:div {:class "plat-bar-fill"
-           :style (str "width:" width "%;background:" color)}]]
-   [:span {:class "plat-count"} count]])
-
-(def ^:private platform-data
-  [{:name "twitter / x" :color "var(--c-twitter)"  :width 68 :count "3,389"}
-   {:name "bluesky"     :color "var(--c-bluesky)"   :width 24 :count "1,197"}
-   {:name "mastodon"    :color "var(--c-mastodon)"  :width  5 :count "249"}
-   {:name "direct"      :color "var(--c-direct)"    :width  3 :count "149"}])
+(defn- render-hp-platforms [platforms]
+  (let [total (apply + (vals platforms))
+        rows  (->> platforms (sort-by val >) (take 4))]
+    (str (h/html
+      [:div {:id "hp-platforms"}
+       (for [[platform cnt] rows]
+         [:div {:class "platform-row"}
+          [:div {:class "cluster cluster--tight plat-name"}
+           [:div {:class "plat-dot"
+                  :style (str "background:var(--c-" platform ")")}]
+           [:span platform]]
+          [:div {:class "plat-bar-track"}
+           [:div {:class "plat-bar-fill"
+                  :style (str "inline-size:"
+                              (when (pos? total)
+                                (format "%.1f" (* 100.0 (/ cnt total))))
+                              "%")}]]
+          [:span {:class "plat-count"} (format "%,d" cnt)]])]))))
 
 (defn dashboard-preview []
   [:section {:class "hp-section"}
@@ -269,9 +271,9 @@
                      [:span {:class "dash-stat__lbl"} "clicks / visitor"]])])
 
           ;; platform breakdown: tight stack of rows
-          (stack {:variant :tight}
-            (into [[:p {:class "platform-section-title"} "by platform"]]
-                  (map platform-row platform-data)))])]])])
+          [:div.stack.stack--tight
+           [:p {:class "platform-section-title"} "by platform"]
+           [:div {:id "hp-platforms"}]]])]])])
 
 ;; ---------------------------------------------------------------------------
 ;; Features
@@ -364,7 +366,7 @@
      (doctype :html5)
      [:html {:lang "en"}
       (head)
-      [:body {:data-signals "{total_clicks:0,unique_visitors:0,links:0,groups:0}"
+      [:body {:data-signals "{connected:false,total_clicks:0,unique_visitors:0,links:0,groups:0}"
               :data-on:datastar-fetch "el === evt.detail.el && ((evt.detail.type.startsWith('datastar') && ($connected = true)) || (['retrying', 'error', 'finished'].includes(evt.detail.type) && ($connected = false)))"
               :data-init    "@get('/stream')"}
        (nav)
@@ -386,15 +388,21 @@
     (->sse-response request
       {on-open
        (fn [sse]
-         (let [ch (async/chan (async/sliding-buffer 10))]
+         (let [ch (async/chan (async/sliding-buffer 10))
+               stats (analytics/global-stats)
+               signals (select-keys stats [:total_clicks :unique_visitors :groups :links])]
            (reset! ch-atom ch)
            (async/sub (:publication pubsub) :analytics-update ch)
            (try
-             (d*/patch-signals! sse (json/generate-string (analytics/global-stats)))
+             (d*/patch-signals! sse (json/generate-string signals))
+             (d*/patch-elements! sse (render-hp-platforms (:platforms stats)))
              (loop []
                (when-let [_ (async/<!! ch)]
                  (try
-                   (d*/patch-signals! sse (json/generate-string (analytics/global-stats)))
+                   (let [stats (analytics/global-stats)
+                         signals (select-keys stats [:total_clicks :unique_visitors :groups :links])]
+                     (d*/patch-signals! sse (json/generate-string signals))
+                     (d*/patch-elements! sse (render-hp-platforms (:platforms stats))))
                    (catch Exception e (log/error "homepage push failed" (.getMessage e))))
                  (recur)))
              (catch Exception e (log/error "homepage stream failed" (.getMessage e))))))

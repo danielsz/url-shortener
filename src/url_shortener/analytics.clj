@@ -63,7 +63,7 @@
 (defn write-analytics! [pubsub geoip {:keys [path owner-id group-id remote-addr referer]}]
   (log/debug path remote-addr referer)
   (try
-    (when (and owner-id (.isValid ip-validator remote-addr))
+    (when (and owner-id (.isValid ip-validator remote-addr)) ;; Links without an owner-id are legacy/anonymous — we don't track their analytics
       (let [platform (referrer->platform referer)
             ttl (if (guest? owner-id) TTL-GUEST-ANALYTICS TTL-ANALYTICS)]
         (redis/wcar nil
