@@ -63,7 +63,7 @@
 (defn write-analytics! [pubsub geoip {:keys [path owner-id group-id remote-addr referer]}]
   (log/debug path remote-addr referer)
   (try
-    (when (.isValid ip-validator remote-addr)
+    (when (and owner-id (.isValid ip-validator remote-addr))
       (let [platform (referrer->platform referer)
             ttl (if (guest? owner-id) TTL-GUEST-ANALYTICS TTL-ANALYTICS)]
         (redis/wcar nil
@@ -93,7 +93,7 @@
                     (redis/hincrby (group-platforms-key group-id) platform 1)
                     (redis/expire  (group-platforms-key group-id) ttl))
         (write-country geoip path group-id remote-addr ttl)
-        (a/thread (a/>!! (:channel pubsub) {:topic :analytics-update :path path :remote-addr remote-addr :group-id group-id :referer referer}))
+        (thread (a/>!! (:channel pubsub) {:topic :analytics-update :path path :remote-addr remote-addr :group-id group-id :referer referer}))
         (when referer
           (redis/wcar nil
                       (redis/lpush  (referrers-key path) referer)
