@@ -429,7 +429,10 @@
 }
 
 /* Typography + colour — layout is .cluster--tight in HTML */
-.plat-name { color: var(--text-s); }
+.plat-name {
+  color: var(--text-s);
+  flex-wrap: nowrap;
+}
 
 .plat-dot {
   width: 5px;

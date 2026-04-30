@@ -208,7 +208,8 @@
 ;; ---------------------------------------------------------------------------
 
 (defn- render-hp-platforms [platforms]
-  (let [total (apply + (vals platforms))
+  (let [platforms (dissoc platforms "direct" "other")
+        total (apply + (vals platforms))
         rows  (->> platforms (sort-by val >))]
     (str (h/html
       [:div {:id "hp-platforms"}
