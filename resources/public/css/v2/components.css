@@ -410,3 +410,49 @@
 }
 
 .hp-nav__links a:hover { color: var(--text-s); }
+
+/* ----------------------------------------------------------------------------
+   Platform rows
+   Three-column grid inside each row: dot+name | bar | count
+   HTML: <div class="platform-row">
+           <div class="cluster cluster--tight plat-name">
+   ---------------------------------------------------------------------------- */
+
+.platform-row {
+  display: grid;
+  grid-template-columns: 20ch 1fr auto;
+  gap: var(--space-xs);
+  align-items: center;
+  padding-block: var(--space-3xs);
+  border-bottom: 0.5px solid var(--border);
+  font-size: var(--step--2);
+}
+
+/* Typography + colour — layout is .cluster--tight in HTML */
+.plat-name { color: var(--text-s); }
+
+.plat-dot {
+  width: 5px;
+  height: 5px;
+  flex-shrink: 0;
+  border-radius: 1px;
+}
+
+.plat-bar-track {
+  height: 3px;
+  background: var(--bg2);
+  border-radius: 1px;
+  position: relative;
+}
+
+.plat-bar-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 1px;
+}
+
+.plat-count {
+  color: var(--text-t);
+  text-align: right;
+  min-inline-size: 2rem;
+}

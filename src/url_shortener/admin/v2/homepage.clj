@@ -209,7 +209,7 @@
 
 (defn- render-hp-platforms [platforms]
   (let [total (apply + (vals platforms))
-        rows  (->> platforms (sort-by val >) (take 4))]
+        rows  (->> platforms (sort-by val >))]
     (str (h/html
       [:div {:id "hp-platforms"}
        (for [[platform cnt] rows]
@@ -217,12 +217,14 @@
           [:div {:class "cluster cluster--tight plat-name"}
            [:div {:class "plat-dot"
                   :style (str "background:var(--c-" platform ")")}]
-           [:span platform]]
+           [:span {:style "overflow:hidden;text-overflow:ellipsis;white-space:nowrap"} platform]]
           [:div {:class "plat-bar-track"}
            [:div {:class "plat-bar-fill"
-                  :style (str "inline-size:"
-                              (when (pos? total)
-                                (format "%.1f" (* 100.0 (/ cnt total))))
+                  :style (str "background:var(--c-" platform ");"
+                              "inline-size:"
+                              (if (pos? total)
+                                (format "%.1f" (* 100.0 (/ cnt total)))
+                                "0")
                               "%")}]]
           [:span {:class "plat-count"} (format "%,d" cnt)]])]))))
 
