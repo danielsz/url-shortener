@@ -30,7 +30,7 @@
    {:id "facebook"  :label "facebook"    :color "var(--c-facebook)"}
    {:id "linkedin"  :label "linkedin"    :color "var(--c-linkedin)"}
    {:id "pinterest" :label "pinterest"   :color "var(--c-pinterest)"}
-   {:id "reddit"    :label "reddit"      :color "var(--c-other)"}
+   {:id "reddit"    :label "reddit"      :color "var(--c-reddit)"}
    {:id "youtube"   :label "youtube"     :color "var(--c-other)"}
    {:id "google"    :label "google"      :color "var(--c-google)"}
    {:id "email"     :label "email"       :color "var(--c-direct)"}])

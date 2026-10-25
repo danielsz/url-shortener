@@ -39,7 +39,6 @@
                                :port "1080",
                                :version "5",
                                :use-system-proxies false}},
-               :tools-deps-alias :repl,
                :repl-host "127.0.0.1",
                :reload-on-save true,
                :repl-port :auto,
